@@ -1,0 +1,18 @@
+{
+  "name": "SIM-PTR BNPP — Monitoring Pilar Titik Referensi",
+  "short_name": "SIM-PTR",
+  "description": "Sistem Informasi Monitoring Pilar Titik Referensi - Badan Nasional Pengelola Perbatasan",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f6f5f1",
+  "theme_color": "#0f766e",
+  "orientation": "any",
+  "icons": [{
+    "src": "logo-bnpp.png",
+    "sizes": "512x512",
+    "type": "image/png",
+    "purpose": "any maskable"
+  }],
+  "categories": ["productivity", "utilities"],
+  "lang": "id"
+}
