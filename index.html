@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SIM-PTR BNPP — Monitoring Pilar Titik Referensi</title>
+<meta name="description" content="Sistem Informasi Monitoring Pilar Titik Referensi - Badan Nasional Pengelola Perbatasan" />
+<meta name="theme-color" content="#0f766e" />
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- Leaflet (Peta) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<style>
+  :root {
+    --bg: #f6f5f1; --bg-elev: #ffffff; --bg-soft: #efede6;
+    --surface: #ffffff; --surface-hover: #faf8f3;
+    --border: #e6e2d6; --border-strong: #d4cfc0;
+    --text: #1a1d1c; --text-muted: #6b6a63; --text-subtle: #9a9890;
+    --primary: #0f766e; --primary-hover: #0d5f58;
+    --primary-soft: #ccfbf1; --primary-ink: #064e3b;
+    --accent: #d97706; --accent-soft: #fef3c7;
+    --danger: #b91c1c; --danger-soft: #fee2e2;
+    --success: #15803d; --success-soft: #dcfce7;
+    --warning: #a16207; --warning-soft: #fef9c3;
+    --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
+    --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.06);
+    --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.08);
+    --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --radius-xl: 20px;
+    --transition: 180ms cubic-bezier(0.4, 0, 0.2, 1);
+    --sidebar-w: 248px;
+  }
+  [data-theme="dark"] {
+    --bg: #0f1413; --bg-elev: #161c1b; --bg-soft: #1a2120;
+    --surface: #1a2120; --surface-hover: #202827;
+    --border: #2a3331; --border-strong: #3a4543;
+    --text: #e8e6df; --text-muted: #9ba3a0; --text-subtle: #6b7370;
+    --primary: #2dd4bf; --primary-hover: #5eead4;
+    --primary-soft: #042f2e; --primary-ink: #ccfbf1;
+    --accent: #fbbf24; --accent-soft: #422006;
+    --danger: #f87171; --danger-soft: #450a0a;
+    --success: #4ade80; --success-soft: #052e16;
+    --warning: #facc15; --warning-soft: #422006;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; font-family: 'Plus Jakarta Sans', -apple-system, sans-serif; font-size: 14px; line-height: 1.55; color: var(--text); background: var(--bg); -webkit-font-smoothing: antialiased; }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+  input, select, textarea { font-family: inherit; font-size: inherit; color: inherit; }
+  a { color: inherit; text-decoration: none; }
+
+  .app { display: grid; grid-template-columns: var(--sidebar-w) 1fr; min-height: 100vh; }
+
+  .sidebar { background: var(--bg-elev); border-right: 1px solid var(--border); padding: 20px 14px; display: flex; flex-direction: column; gap: 4px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+  .brand { display: flex; align-items: center; gap: 12px; padding: 8px 10px 20px; border-bottom: 1px solid var(--border); margin-bottom: 12px; }
+  .brand-logo { width: 48px; height: 48px; border-radius: 50%; object-fit: contain; box-shadow: 0 2px 8px rgba(15, 118, 110, 0.2); background: white; padding: 2px; }
+  .brand-text { display: flex; flex-direction: column; line-height: 1.2; }
+  .brand-text strong { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; }
+  .brand-text span { font-size: 11px; color: var(--text-muted); }
+
+  .nav-section-title { font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-subtle); padding: 12px 12px 6px; }
+  .nav-item { display: flex; align-items: center; gap: 11px; padding: 9px 12px; border-radius: var(--radius-sm); color: var(--text-muted); font-size: 13.5px; font-weight: 500; transition: all var(--transition); cursor: pointer; }
+  .nav-item:hover { background: var(--surface-hover); color: var(--text); }
+  .nav-item.active { background: var(--primary-soft); color: var(--primary-ink); font-weight: 600; }
+  [data-theme="dark"] .nav-item.active { color: var(--primary); }
+  .nav-item .icon { width: 18px; height: 18px; flex-shrink: 0; stroke-width: 1.8; }
+  .nav-item .badge { margin-left: auto; background: var(--accent); color: white; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
+
+  .sidebar-footer { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border); }
+  .user-card { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: var(--radius-md); transition: background var(--transition); }
+  .user-card:hover { background: var(--surface-hover); }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #d97706); display: grid; place-items: center; color: white; font-weight: 700; font-size: 13px; }
+  .user-info { flex: 1; min-width: 0; }
+  .user-info strong { display: block; font-size: 13px; font-weight: 600; }
+  .user-info span { font-size: 11px; color: var(--text-muted); }
+
+  .main { display: flex; flex-direction: column; min-width: 0; }
+  .topbar { display: flex; align-items: center; gap: 16px; padding: 14px 28px; background: var(--bg-elev); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 20; }
+  .header-logo { height: 40px; width: auto; object-fit: contain; }
+  .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); }
+  .breadcrumb strong { color: var(--text); font-weight: 600; }
+  .breadcrumb .sep { color: var(--text-subtle); }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+
+  .search-box { display: flex; align-items: center; gap: 8px; background: var(--bg-soft); border: 1px solid transparent; padding: 8px 12px; border-radius: var(--radius-sm); min-width: 260px; transition: all var(--transition); }
+  .search-box:focus-within { background: var(--surface); border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+  .search-box input { border: none; background: none; outline: none; flex: 1; font-size: 13px; }
+  .search-box svg { color: var(--text-subtle); width: 16px; height: 16px; }
+
+  .icon-btn { width: 36px; height: 36px; display: grid; place-items: center; border-radius: var(--radius-sm); color: var(--text-muted); transition: all var(--transition); position: relative; }
+  .icon-btn:hover { background: var(--surface-hover); color: var(--text); }
+  .icon-btn svg { width: 18px; height: 18px; }
+  .icon-btn .dot { position: absolute; top: 8px; right: 9px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); border: 2px solid var(--bg-elev); }
+
+  .content { padding: 24px 28px 40px; display: flex; flex-direction: column; gap: 20px; }
+  .page-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .page-header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
+  .page-header p { color: var(--text-muted); font-size: 13.5px; }
+
+  .epoch-switch { display: inline-flex; background: var(--bg-soft); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 3px; gap: 2px; }
+  .epoch-switch button { padding: 6px 14px; border-radius: 6px; font-size: 12.5px; font-weight: 500; color: var(--text-muted); transition: all var(--transition); }
+  .epoch-switch button.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); font-weight: 600; }
+
+  .btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 15px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; transition: all var(--transition); border: 1px solid transparent; }
+  .btn svg { width: 15px; height: 15px; }
+  .btn-primary { background: var(--primary); color: white; box-shadow: 0 1px 2px rgba(15, 118, 110, 0.2); }
+  .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+  .btn-ghost { background: var(--surface); color: var(--text); border-color: var(--border); }
+  .btn-ghost:hover { background: var(--surface-hover); border-color: var(--border-strong); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .login-screen { position: fixed; inset: 0; background: var(--bg); display: grid; place-items: center; z-index: 100; }
+  .login-screen.hidden { display: none; }
+  .login-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 32px; width: 100%; max-width: 420px; box-shadow: var(--shadow-lg); }
+  .login-header { text-align: center; margin-bottom: 24px; }
+  .login-header .brand-logo { width: 72px; height: 72px; margin: 0 auto 12px; display: block; }
+  .login-header h2 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .login-header p { font-size: 13px; color: var(--text-muted); }
+  .login-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+  .login-field label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+  .login-field input { background: var(--bg-soft); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 13px; outline: none; transition: all var(--transition); }
+  .login-field input:focus { background: var(--surface); border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+  .login-btn { width: 100%; background: var(--primary); color: white; padding: 11px; border-radius: var(--radius-sm); font-size: 13.5px; font-weight: 600; margin-top: 8px; transition: all var(--transition); }
+  .login-btn:hover { background: var(--primary-hover); }
+  .login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  .login-error { background: var(--danger-soft); color: var(--danger); padding: 10px 12px; border-radius: var(--radius-sm); font-size: 12.5px; margin-bottom: 12px; display: none; }
+  .login-error.show { display: block; }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px; transition: all var(--transition); position: relative; overflow: hidden; }
+  .stat-card:hover { border-color: var(--border-strong); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+  .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--accent, var(--primary)); }
+  .stat-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+  .stat-label { font-size: 12.5px; color: var(--text-muted); font-weight: 500; }
+  .stat-icon { width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; background: var(--icon-bg, var(--primary-soft)); color: var(--icon-color, var(--primary)); }
+  .stat-icon svg { width: 16px; height: 16px; }
+  .stat-value { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .stat-meta { display: flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 11.5px; color: var(--text-muted); }
+  .trend-up { color: var(--success); font-weight: 600; }
+
+  .map-hero { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; display: flex; flex-direction: column; }
+  .map-hero-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 10px; }
+  .map-hero-title { display: flex; align-items: center; gap: 10px; font-size: 14.5px; font-weight: 600; }
+  .map-hero-title .dot-live { width: 7px; height: 7px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 3px var(--success-soft); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+  .map-hero-meta { display: flex; align-items: center; gap: 16px; font-size: 12px; color: var(--text-muted); flex-wrap: wrap; }
+  .map-hero-meta .stat-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: var(--bg-soft); border-radius: 20px; font-weight: 500; }
+  .map-hero-meta .stat-pill strong { color: var(--text); font-weight: 700; }
+  #map { height: 560px; width: 100%; background: var(--bg-soft); }
+  .map-legend { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 10px 14px; display: flex; gap: 14px; font-size: 11.5px; box-shadow: var(--shadow-sm); flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; color: var(--text-muted); }
+  .legend-dot { width: 9px; height: 9px; border-radius: 50%; }
+
+  .custom-marker { background: transparent; border: none; }
+  .ptr-popup { font-family: 'Plus Jakarta Sans', sans-serif; min-width: 240px; }
+  .ptr-popup-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .ptr-popup-id { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); }
+  .ptr-popup-name { font-size: 14px; font-weight: 700; margin-top: 2px; }
+  .ptr-popup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px; }
+  .ptr-popup-item-label { font-size: 9px; text-transform: uppercase; color: var(--text-subtle); font-weight: 600; }
+  .ptr-popup-item-value { font-size: 12px; font-weight: 600; }
+  .ptr-popup-item-value.mono { font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+  .ptr-popup-koarmada { background: var(--bg-soft); border-radius: 6px; padding: 8px 10px; margin-bottom: 8px; }
+  .ptr-popup-koarmada-title { font-size: 9px; text-transform: uppercase; color: var(--text-subtle); font-weight: 600; margin-bottom: 4px; }
+  .ptr-popup-koarmada-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .ptr-popup-koarmada-item { font-size: 11px; font-weight: 600; color: var(--primary); }
+  .ptr-popup-cctv { background: var(--primary-soft); border-radius: 6px; padding: 8px 10px; display: flex; align-items: center; gap: 8px; font-size: 12px; }
+  .ptr-popup-cctv-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); animation: pulse 1.5s infinite; }
+
+  .grid-main { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; display: flex; flex-direction: column; }
+  .panel-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+  .panel-title { display: flex; align-items: center; gap: 9px; font-size: 14px; font-weight: 600; }
+  .panel-actions { display: flex; gap: 6px; }
+  .panel-body { padding: 16px 18px; }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-grid .full { grid-column: 1 / -1; }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 11.5px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .input, .select, .textarea { background: var(--bg-soft); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 9px 12px; font-size: 13px; transition: all var(--transition); outline: none; width: 100%; }
+  .input:focus, .select:focus, .textarea:focus { background: var(--surface); border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+  .textarea { resize: vertical; min-height: 70px; font-family: inherit; }
+
+  .gps-box { background: var(--bg-soft); border: 1px dashed var(--border-strong); border-radius: var(--radius-md); padding: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .gps-box .coord { display: flex; flex-direction: column; gap: 2px; }
+  .gps-box .coord-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-subtle); font-weight: 600; }
+  .gps-box .coord-value { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 500; color: var(--text); }
+  .btn-gps { grid-column: 1 / -1; background: var(--primary); color: white; padding: 10px; border-radius: var(--radius-sm); font-size: 12.5px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 7px; transition: all var(--transition); }
+  .btn-gps:hover { background: var(--primary-hover); }
+  .btn-gps.loading { opacity: 0.7; pointer-events: none; }
+
+  .chip-group { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { padding: 6px 12px; border-radius: 20px; background: var(--bg-soft); border: 1px solid var(--border); font-size: 12px; font-weight: 500; color: var(--text-muted); transition: all var(--transition); }
+  .chip:hover { border-color: var(--border-strong); color: var(--text); }
+  .chip.active { background: var(--primary-soft); border-color: var(--primary); color: var(--primary-ink); }
+
+  .photo-drop { border: 1.5px dashed var(--border-strong); border-radius: var(--radius-md); padding: 22px; text-align: center; transition: all var(--transition); cursor: pointer; }
+  .photo-drop:hover, .photo-drop.dragover { border-color: var(--primary); background: var(--primary-soft); }
+  .photo-drop svg { width: 28px; height: 28px; color: var(--text-subtle); margin-bottom: 6px; }
+  .photo-drop strong { font-size: 13px; display: block; margin-bottom: 2px; }
+  .photo-drop span { font-size: 11.5px; color: var(--text-muted); }
+
+  .cctv-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .cctv-tile { position: relative; aspect-ratio: 16 / 10; border-radius: var(--radius-md); overflow: hidden; background: #0a0a0a; border: 2px solid var(--border); transition: all var(--transition); cursor: pointer; }
+  .cctv-tile:hover { border-color: var(--border-strong); }
+  .cctv-tile.selected { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft), var(--shadow-lg); transform: scale(1.02); }
+  .cctv-tile.dimmed { opacity: 0.45; filter: grayscale(0.4); }
+  .cctv-tile .feed { position: absolute; inset: 0; background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%); display: grid; place-items: center; color: #444; }
+  .cctv-tile .feed::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.02) 2px, rgba(255,255,255,0.02) 4px); }
+  .cctv-label { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); color: white; font-size: 10.5px; font-weight: 600; padding: 3px 8px; border-radius: 6px; display: flex; align-items: center; gap: 5px; }
+  .cctv-label .rec { width: 6px; height: 6px; border-radius: 50%; background: #ef4444; animation: pulse 1.5s infinite; }
+  .cctv-selected-badge { position: absolute; top: 8px; right: 8px; background: var(--primary); color: white; font-size: 9.5px; font-weight: 700; padding: 3px 7px; border-radius: 6px; letter-spacing: 0.06em; opacity: 0; transform: scale(0.8); transition: all var(--transition); }
+  .cctv-tile.selected .cctv-selected-badge { opacity: 1; transform: scale(1); }
+  .cctv-time { position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); color: white; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 2px 6px; border-radius: 4px; }
+
+  .toast-container { position: fixed; top: 20px; right: 20px; z-index: 200; display: flex; flex-direction: column; gap: 10px; }
+  .toast { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--primary); border-radius: var(--radius-md); padding: 12px 16px; box-shadow: var(--shadow-lg); min-width: 280px; max-width: 400px; display: flex; align-items: flex-start; gap: 10px; animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+  .toast.success { border-left-color: var(--success); }
+  .toast.error { border-left-color: var(--danger); }
+  .toast.warning { border-left-color: var(--warning); }
+  .toast-icon { width: 20px; height: 20px; flex-shrink: 0; color: var(--primary); }
+  .toast.success .toast-icon { color: var(--success); }
+  .toast.error .toast-icon { color: var(--danger); }
+  .toast-content { flex: 1; }
+  .toast-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+  .toast-message { font-size: 12px; color: var(--text-muted); }
+  .toast-close { width: 20px; height: 20px; display: grid; place-items: center; color: var(--text-subtle); border-radius: 4px; transition: all var(--transition); }
+  .toast-close:hover { background: var(--bg-soft); color: var(--text); }
+  @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+  .offline-banner { position: fixed; top: 0; left: 0; right: 0; background: var(--warning); color: white; padding: 8px 16px; text-align: center; font-size: 12.5px; font-weight: 600; z-index: 100; display: none; }
+  .offline-banner.show { display: block; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .animate-in { animation: fadeUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) both; }
+  .delay-1 { animation-delay: 0.05s; }
+  .delay-2 { animation-delay: 0.1s; }
+  .delay-3 { animation-delay: 0.15s; }
+  .delay-4 { animation-delay: 0.2s; }
+
+  @media (max-width: 1100px) { .grid-main { grid-template-columns: 1fr; } }
+  @media (max-width: 768px) {
+    :root { --sidebar-w: 0px; }
+    .sidebar { display: none; }
+    .content { padding: 18px; }
+    .topbar { padding: 12px 18px; }
+    .search-box { min-width: 0; flex: 1; }
+    .form-grid { grid-template-columns: 1fr; }
+    #map { height: 420px; }
+    .map-hero-meta { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="offline-banner" id="offlineBanner">⚠️ Anda sedang offline. Data akan disinkronkan saat koneksi tersedia.</div>
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-header">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Logo_BNPP.png/200px-Logo_BNPP.png" alt="Logo BNPP-RI" class="brand-logo" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%230f766e%22/><text x=%2250%22 y=%2260%22 font-family=%22Arial%22 font-size=%2230%22 font-weight=%22bold%22 fill=%22white%22 text-anchor=%22middle%22>BNPP</text></svg>'" />
+      <h2>SIM-PTR BNPP</h2>
+      <p>Masuk untuk melanjutkan pemantauan PTR</p>
+    </div>
+    <div class="login-error" id="loginError"></div>
+    <form id="loginForm">
+      <div class="login-field">
+        <label>Email</label>
+        <input type="email" id="loginUsername" placeholder="admin@bnpp.go.id" required autocomplete="email" />
+      </div>
+      <div class="login-field">
+        <label>Kata Sandi</label>
+        <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password" />
+      </div>
+      <button type="submit" class="login-btn" id="loginBtn">Masuk</button>
+    </form>
+    <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); text-align: center;">
+      <button class="btn btn-ghost" id="demoBtn" style="width: 100%; justify-content: center;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px;"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        Mode Demo
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="app" id="mainApp" style="display:none;">
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Logo_BNPP.png/200px-Logo_BNPP.png" alt="Logo BNPP-RI" class="brand-logo" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%230f766e%22/><text x=%2250%22 y=%2260%22 font-family=%22Arial%22 font-size=%2230%22 font-weight=%22bold%22 fill=%22white%22 text-anchor=%22middle%22>BNPP</text></svg>'" />
+      <div class="brand-text">
+        <strong>SIM-PTR BNPP</strong>
+        <span>Monitoring v2.4</span>
+      </div>
+    </div>
+    <div class="nav-section-title">Ruang Kerja</div>
+    <a class="nav-item active" data-view="dashboard">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+      Dashboard
+    </a>
+    <a class="nav-item" data-view="map">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 20l-6-3V5l6 3 6-3 6 3v12l-6-3-6 3z"/><path d="M9 8v12M15 5v12"/></svg>
+      Peta PTR
+      <span class="badge" id="ptrCountBadge">—</span>
+    </a>
+    <a class="nav-item" data-view="inventory">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      Inventarisasi
+    </a>
+    <a class="nav-item" data-view="cctv">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+      CCTV
+    </a>
+    <div class="nav-section-title">Data & Laporan</div>
+    <a class="nav-item" data-view="reports">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+      Laporan
+    </a>
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="avatar" id="userAvatar">AR</div>
+        <div class="user-info">
+          <strong id="userName">—</strong>
+          <span id="userRole">—</span>
+        </div>
+        <button class="icon-btn" id="logoutBtn" title="Keluar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Logo_BNPP.png/200px-Logo_BNPP.png" alt="BNPP-RI" class="header-logo" onerror="this.style.display='none'" />
+      <div class="breadcrumb">
+        <span>Ruang Kerja</span>
+        <span class="sep">/</span>
+        <strong id="breadcrumbCurrent">Dashboard Monitoring</strong>
+      </div>
+      <div class="topbar-actions">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" id="globalSearch" placeholder="Cari ID PTR, wilayah..." />
+        </div>
+        <button class="icon-btn" id="themeToggle" title="Ganti tema">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        </button>
+        <button class="icon-btn" title="Notifikasi">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+          <span class="dot"></span>
+        </button>
+        <button class="btn btn-primary" id="btnCatat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          Catat
+        </button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="page-header animate-in">
+        <div>
+          <h1>Monitoring Pilar Titik Referensi</h1>
+          <p>Klik titik pada peta untuk melihat kondisi & data Koarmada/Kodaeral.</p>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <div class="epoch-switch" id="epochSwitch">
+            <button data-epoch="2012.0">2012.0</button>
+            <button data-epoch="2021.0" class="active">2021.0</button>
+            <button data-epoch="2026.0">2026.0</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card animate-in delay-1" style="--accent: var(--primary);">
+          <div class="stat-head">
+            <span class="stat-label">Total PTR Terdaftar</span>
+            <div class="stat-icon" style="--icon-bg: var(--primary-soft); --icon-color: var(--primary);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+          </div>
+          <div class="stat-value" id="statTotal">—</div>
+          <div class="stat-meta"><span class="trend-up" id="statTotalTrend">—</span><span>dari periode sebelumnya</span></div>
+        </div>
+        <div class="stat-card animate-in delay-2" style="--accent: var(--success);">
+          <div class="stat-head">
+            <span class="stat-label">Kondisi Normal</span>
+            <div class="stat-icon" style="--icon-bg: var(--success-soft); --icon-color: var(--success);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
+            </div>
+          </div>
+          <div class="stat-value" id="statNormal">—</div>
+          <div class="stat-meta"><span id="statNormalPct">—</span></div>
+        </div>
+        <div class="stat-card animate-in delay-3" style="--accent: var(--accent);">
+          <div class="stat-head">
+            <span class="stat-label">Perlu Tindak Lanjut</span>
+            <div class="stat-icon" style="--icon-bg: var(--accent-soft); --icon-color: var(--accent);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+            </div>
+          </div>
+          <div class="stat-value" id="statAction">—</div>
+          <div class="stat-meta"><span>perlu perhatian</span></div>
+        </div>
+        <div class="stat-card animate-in delay-4" style="--accent: var(--danger);">
+          <div class="stat-head">
+            <span class="stat-label">Belum Diperiksa &gt; 90 Hari</span>
+            <div class="stat-icon" style="--icon-bg: var(--danger-soft); --icon-color: var(--danger);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            </div>
+          </div>
+          <div class="stat-value" id="statOverdue">—</div>
+          <div class="stat-meta"><span>perlu pemeriksaan segera</span></div>
+        </div>
+      </div>
+
+      <div class="map-hero animate-in delay-2">
+        <div class="map-hero-head">
+          <div class="map-hero-title">
+            <span class="dot-live"></span>
+            Peta Sebaran PTR (Satelit)
+          </div>
+          <div class="map-hero-meta">
+            <span class="stat-pill"><strong id="mapActiveCount">—</strong> titik aktif</span>
+            <span class="stat-pill"><strong id="mapCctvCount">—</strong> CCTV live</span>
+            <select id="filterKoarmada" style="padding:4px 10px; background:var(--bg-soft); border:1px solid var(--border); border-radius:20px; font-size:12px; font-weight:500; cursor:pointer;">
+              <option value="">Semua Koarmada</option>
+              <option value="Koarmada I">🔵 Koarmada I (Barat)</option>
+              <option value="Koarmada II">🟢 Koarmada II (Tengah)</option>
+              <option value="Koarmada III">🟠 Koarmada III (Timur)</option>
+            </select>
+          </div>
+        </div>
+        <div id="map"></div>
+        <div style="padding:10px 20px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div class="map-legend">
+            <div class="legend-item"><span class="legend-dot" style="background:#15803d"></span>Normal</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#d97706"></span>Perlu Pemeliharaan</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#b91c1c"></span>Perlu Perbaikan</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#7c2d12"></span>Perlu Relokasi</div>
+          </div>
+          <span style="font-size:11px; color:var(--text-subtle);">🛰️ Basemap: Esri World Imagery</span>
+        </div>
+      </div>
+
+      <div class="grid-main">
+        <div class="panel animate-in delay-3">
+          <div class="panel-head">
+            <div class="panel-title">
+              <svg style="width:16px; height:16px; color:var(--primary);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              Inventarisasi Lapangan
+            </div>
+            <span style="font-size:11px; color:var(--text-muted); font-family:'JetBrains Mono', monospace;" id="draftStatus">Draft · 0 item</span>
+          </div>
+          <div class="panel-body">
+            <form id="inventoryForm">
+              <div class="form-grid">
+                <div class="field full">
+                  <label>Lokasi GPS (WGS 84)</label>
+                  <div class="gps-box">
+                    <div class="coord"><span class="coord-label">Latitude</span><span class="coord-value" id="lat">-6.2088°</span></div>
+                    <div class="coord"><span class="coord-label">Longitude</span><span class="coord-value" id="lng">106.8456°</span></div>
+                    <div class="coord"><span class="coord-label">UTM Easting</span><span class="coord-value" id="east">478291.3 m</span></div>
+                    <div class="coord"><span class="coord-label">UTM Northing</span><span class="coord-value" id="north">9313048.7 m</span></div>
+                    <button type="button" class="btn-gps" id="btnGps">
+                      <svg style="width:14px; height:14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+                      Mulai GPS
+                    </button>
+                  </div>
+                </div>
+                <div class="field"><label>ID PTR</label><input type="text" class="input" name="code" placeholder="PTR-0000" required /></div>
+                <div class="field"><label>Wilayah / Lokasi</label><input type="text" class="input" name="region" placeholder="Jakarta Pusat" required /></div>
+                <div class="field"><label>Kondisi Bangunan</label>
+                  <select class="select" name="condition_status" required>
+                    <option value="normal">Normal</option>
+                    <option value="maintenance">Perlu Pemeliharaan</option>
+                    <option value="repair">Perlu Perbaikan</option>
+                    <option value="relocate">Perlu Relokasi</option>
+                  </select>
+                </div>
+                <div class="field"><label>Kemiringan Pilar (°)</label><input type="number" class="input" name="tilt_degree" placeholder="0.0" step="0.1" min="0" max="90" /></div>
+                <div class="field full"><label>Jenis Pemeriksaan</label>
+                  <div class="chip-group" id="inspectionType">
+                    <button type="button" class="chip active" data-value="rutin">Rutin</button>
+                    <button type="button" class="chip" data-value="insidental">Insidental</button>
+                    <button type="button" class="chip" data-value="pasca_bencana">Pasca Bencana</button>
+                  </div>
+                </div>
+                <div class="field full"><label>Foto Timestamp (maks. 3)</label>
+                  <div class="photo-drop" id="photoDrop">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                    <strong>Drop foto timestamp di sini</strong>
+                    <span>JPG, PNG · atau klik untuk memilih</span>
+                    <input type="file" id="photoInput" accept="image/*" multiple style="display:none;" />
+                  </div>
+                </div>
+                <div class="field full"><label>Catatan (opsional)</label><textarea class="textarea" name="notes" placeholder="Tambahkan observasi lapangan..."></textarea></div>
+                <div class="full" style="display:flex; gap:8px; justify-content:flex-end;">
+                  <button type="button" class="btn btn-ghost" id="btnSaveDraft">Simpan Draft</button>
+                  <button type="submit" class="btn btn-primary" id="btnSubmit">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+                    Simpan ke Server
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="panel animate-in delay-4" id="cctvPanel">
+          <div class="panel-head">
+            <div class="panel-title">
+              <span class="dot-live"></span>
+              CCTV Pemantauan PTR
+              <span id="cctvSelection" style="display:none; font-size:11px; font-weight:500; color:var(--primary); background:var(--primary-soft); padding:3px 9px; border-radius:10px; margin-left:4px;"></span>
+            </div>
+            <div class="panel-actions">
+              <button class="icon-btn" id="cctvReset" title="Reset tampilan">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12a9 9 0 019-9 9.75 9.75 0 016.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 01-9 9 9.75 9.75 0 01-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="cctv-grid" id="cctvGrid"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+/* ============================================
+   SIM-PTR BNPP — v2.5 (Self-Contained)
+   ============================================ */
+'use strict';
+
+/* ============================================
+   KONFIGURASI SUPABASE — GANTI DENGAN DATA ANDA!
+   ============================================ */
+const SUPABASE_URL = 'https://fxonipiycdrkcxxnjpyx.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_kl_nJihVd0EVUJKmGylW_A_j2xNJIBb';
+
+const CONFIG = {
+  TOKEN_KEY: 'simptr-token',
+  USER_KEY: 'simptr-user',
+  DEMO_MODE_KEY: 'simptr-demo'
+};
+
+let supabase = null;
+try {
+  if (window.supabase && SUPABASE_URL && SUPABASE_URL.includes('supabase.co')) {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    console.log('%c SIM-PTR BNPP ', 'background:#0f766e; color:white; padding:4px 8px; border-radius:4px; font-weight:bold;', 'Supabase connected');
+  } else {
+    console.warn('Supabase belum dikonfigurasi. Mode Demo akan aktif.');
+  }
+} catch (e) {
+  console.warn('Supabase init error:', e);
+}
+
+/* ============================================
+   DATA 156 PTR DARI EXCEL PP14/2026
+   ============================================ */
+const PTR_DATA_FULL = [
+  {code:'001',td:'001',epoch:'2025.0',latitude:1.240833,longitude:104.575556,region:'Kepri',district:'Bintan',location_desc:'Pulau Berakit',block_code:'Bintan Pesisir',condition_status:'normal',tilt_degree:0,notes:'Baik',koarmada:'Koarmada I',kodaeral:'Kodaeral IV (Batam)',perbatasan:'Malaysia',perairan:'Laut Natuna'},
+  {code:'001A',td:'001A',epoch:'2011.0',latitude:1.047778,longitude:104.830556,region:'Kepri',district:'Bintan',location_desc:'Pulau Sentut',block_code:'Bintan Pesisir',condition_status:'repair',tilt_degree:0,notes:'Rusak',koarmada:'Koarmada I',kodaeral:'Kodaeral IV (Batam)',perbatasan:'Malaysia',perairan:'Laut Natuna'},
+  {code:'022',td:'022',epoch:'2021.0',latitude:2.299944,longitude:105.596167,region:'Kepri',district:'Natuna',location_desc:'Pulau Tokongmalangbiru',block_code:'Siantan',condition_status:'repair',tilt_degree:0,notes:'Rusak',koarmada:'Koarmada I',kodaeral:'Kodaeral IV (Batam)',perbatasan:'Malaysia',perairan:'Laut Natuna'},
+  {code:'023',td:'023',epoch:'2021.0',latitude:2.741389,longitude:105.379444,region:'Kepri',district:'Natuna',location_desc:'Pulau Damar',block_code:'Jemaja',condition_status:'relocate',tilt_degree:0,notes:'Hilang',koarmada:'Koarmada I',kodaeral:'Kodaeral IV (Batam)',perbatasan:'Malaysia',perairan:'Laut Natuna Utara'},
+  {code:'024',td:'024',epoch:'2021.0',latitude:3.092222,longitude:105.583333,region:'Kepri',district:'Kep. Anambas',location_desc:'P. Mangkai',block_code:'Jemaja',condition_status:'repair',tilt_degree:0,notes:'Rusak',koarmada:'Koarmada I',kodaeral:'Kodaeral IV (Batam)',perbatasan:'Malaysia',perairan:'Laut Natuna'},
+  {code:'025',td:'025',epoch:'2021.0',latitude:3.331111,longitude:105.951111,region:'Kepri',district:'Natuna',location_desc:'Pulau Tokongnanas',block_code:'Siantan',condition_status:'relocate',tilt_degree:0,notes:'Hilang',koarmada:'Koarmada I',kodaeral:'Kodaeral IV (Batam)',perbatasan:'Malaysia',perairan:'Laut Natuna Utara'},
+  {code:'026',td:'026',epoch:'2021.0',latitude:3.451111,longitude:106.268889,region:'Kepri',district:'Kep. Anambas',location_desc:'Pulau Tokongbelayar',block_code:'Palmatak',condition_status:'relocate',tilt_degree:0,notes:'Hilang',koarmada:'Koarmada I',kodaeral:'Kodaeral IV (Batam)',perbatasan:'Malaysia',perairan:'Laut Natuna'},
+  {code:'028',td:'028',epoch:'2021.0',latitude:4.066944,longitude:107.435833,region:'Kepri',district:'Natuna',location_desc:'P. Tokongboro',block_code:'Pulau Laut',condition_status:'repair',tilt_degree:0,notes:'Rusak',koarmada:'Koarmada I',kodaeral:'Kodaeral IV (Batam)',perbatasan:'Malaysia',perairan:'Laut Natuna'},
+  {code:'029',td:'029',epoch:'2021.0',latitude:4.519167,longitude:107.721389,region:'Kepri',district:'Natuna',location_desc:'P. Semiun',block_code:'Pulau Laut',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral IV (Batam)',perbatasan:'Malaysia',perairan:'Laut Natuna Utara'},
+  {code:'030A',td:'030A',epoch:'2021.0',latitude:4.706944,longitude:107.905556,region:'Kepri',district:'Natuna',location_desc:'P. Sebetul',block_code:'Pulau Laut',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral IV (Batam)',perbatasan:'Malaysia, Vietnam',perairan:'Laut Natuna Utara'},
+  {code:'030',td:'030',epoch:'2021.0',latitude:4.794222,longitude:108.010833,region:'Kepri',district:'Natuna',location_desc:'Pulau Sekatung',block_code:'Pulau Laut',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral XII (Pontianak)',perbatasan:'Malaysia, Vietnam',perairan:'Laut Natuna Utara'},
+  {code:'031',td:'031',epoch:'2021.0',latitude:4.013333,longitude:108.417778,region:'Kepri',district:'Natuna',location_desc:'P. Senua',block_code:'Bunguran',condition_status:'repair',tilt_degree:0,notes:'Rusak',koarmada:'Koarmada I',kodaeral:'Kodaeral XII (Pontianak)',perbatasan:'Malaysia',perairan:'Laut Natuna Utara'},
+  {code:'032',td:'032',epoch:'2021.0',latitude:3.030833,longitude:108.914444,region:'Kepri',district:'Natuna',location_desc:'P. Subi Kecil',block_code:'Subi',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral XII (Pontianak)',perbatasan:'Malaysia',perairan:'Laut Natuna Utara'},
+  {code:'033',td:'033',epoch:'2021.0',latitude:2.645278,longitude:109.167778,region:'Kepri',district:'Natuna',location_desc:'P. Kepala',block_code:'Serasan',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral XII (Pontianak)',perbatasan:'Malaysia',perairan:'Laut Natuna'},
+  {code:'035',td:'035',epoch:'2021.0',latitude:2.086111,longitude:109.645278,region:'Kalbar',district:'Sambas',location_desc:'Tanjung Datu, Pulau Kalimantan',block_code:'Temajuk',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral XII (Pontianak)',perbatasan:'Malaysia',perairan:'Laut Natuna Utara'},
+  {code:'036A',td:'036A',epoch:'2021.0',latitude:4.166111,longitude:117.928889,region:'Kaltara',district:'Nunukan',location_desc:'P.Sebatik',block_code:'Sebatik Utara',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral XIII (Tarakan)',perbatasan:'Malaysia',perairan:'Laut Sulawesi'},
+  {code:'039',td:'039',epoch:'2021.0',latitude:2.253333,longitude:118.644722,region:'Kaltim',district:'Berau',location_desc:'P. Maratua',block_code:'Maratua',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral VI (Makassar)',perbatasan:'Malaysia',perairan:'Laut Sulawesi'},
+  {code:'040',td:'040',epoch:'2021.0',latitude:1.781389,longitude:119.040556,region:'Kaltim',district:'Berau',location_desc:'Pulau Sambit',block_code:'Maratua',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral VI (Makassar)',perbatasan:'Malaysia, Filipina',perairan:'Laut Sulawesi'},
+  {code:'043',td:'043',epoch:'2021.0',latitude:0.998611,longitude:120.213889,region:'Sulteng',district:'Toli-toli',location_desc:'P. Lingian',block_code:'Dampai Utara',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral VIII (Manado)',perbatasan:'Filipina',perairan:'Selat Makassar'},
+  {code:'044',td:'044',epoch:'2021.0',latitude:1.337833,longitude:120.791944,region:'Sulteng',district:'Toli-toli',location_desc:'P. Salando',block_code:'Dako Pamean',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral VIII (Manado)',perbatasan:'Filipina',perairan:'Laut Sulawesi'},
+  {code:'044A',td:'044A',epoch:'2021.0',latitude:1.377778,longitude:120.884444,region:'Sulteng',district:'Toli-toli',location_desc:'P. Dolangan',block_code:'Toli-toli Utara',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral VIII (Manado)',perbatasan:'Filipina',perairan:'Laut Sulawesi'},
+  {code:'045',td:'045',epoch:'2021.0',latitude:1.313444,longitude:121.443556,region:'Gorontalo',district:'Gorontalo Utara',location_desc:'Tg. Kramat',block_code:'Sumalata',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral VIII (Manado)',perbatasan:'Filipina',perairan:'Laut Sulawesi'},
+  {code:'046A',td:'046A',epoch:'2021.0',latitude:1.138056,longitude:122.429722,region:'Gorontalo',district:'Gorontalo Utara',location_desc:'Kr. Boliogut',block_code:'Tolinggula',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral VIII (Manado)',perbatasan:'Filipina',perairan:'Laut Sulawesi'},
+  {code:'047',td:'047',epoch:'2021.0',latitude:1.047778,longitude:123.1125,region:'Sulut',district:'Bolaang Mongondow Utara',location_desc:'P. Bangkit',block_code:'Kadipang',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral VIII (Manado)',perbatasan:'Filipina',perairan:'Laut Sulawesi'},
+  {code:'048',td:'048',epoch:'2021.0',latitude:1.158056,longitude:124.343889,region:'Sulut',district:'Minahasa Selatan',location_desc:'Laimpangi',block_code:'Sinonsayang',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral VIII (Manado)',perbatasan:'Filipina',perairan:'Laut Sulawesi'},
+  {code:'049A',td:'049A',epoch:'2021.0',latitude:1.763056,longitude:124.730833,region:'Sulut',district:'Minahasa Utara',location_desc:'Manterawu',block_code:'Wori',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral VIII (Manado)',perbatasan:'Filipina',perairan:'Laut Sulawesi'},
+  {code:'051A',td:'051A',epoch:'2012.0',latitude:2.7375,longitude:125.157778,region:'Sulut',district:'Siau Tagulandang Biaro',location_desc:'Makalehi',block_code:'Siau Bar',condition_status:'repair',tilt_degree:0,notes:'Rusak',koarmada:'Koarmada II',kodaeral:'Kodaeral VIII (Manado)',perbatasan:'Filipina',perairan:'Laut Sulawesi'},
+  {code:'053A',td:'053A',epoch:'2021.0',latitude:4.235,longitude:125.316389,region:'Sulut',district:'Kep. Sangihe',location_desc:'Kawalusu',block_code:'Marore',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral VIII (Manado)',perbatasan:'Filipina',perairan:'Laut Sulawesi'},
+  {code:'054',td:'054',epoch:'2012.0',latitude:4.671111,longitude:125.428056,region:'Sulut',district:'Kep. Sangihe',location_desc:'P. Kawio',block_code:'Marore',condition_status:'repair',tilt_degree:0,notes:'Rusak',koarmada:'Koarmada II',kodaeral:'Kodaeral VIII (Manado)',perbatasan:'Filipina',perairan:'Laut Sulawesi'},
+  {code:'055',td:'055',epoch:'2021.0',latitude:4.737278,longitude:125.478222,region:'Sulut',district:'Kep. Sangihe',location_desc:'P. Marore',block_code:'Marore',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral VIII (Manado)',perbatasan:'Filipina',perairan:'Laut Sulawesi'},
+  {code:'056',td:'056',epoch:'2021.0',latitude:5.56875,longitude:126.58125,region:'Sulut',district:'Kep. Talaud',location_desc:'P. Miangas',block_code:'Miangas',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral VIII (Manado)',perbatasan:'Filipina',perairan:'Laut Filipina'},
+  {code:'057A',td:'057A',epoch:'2021.0',latitude:4.771667,longitude:127.142222,region:'Sulut',district:'Kep. Talaud',location_desc:'P.Marampit',block_code:'Nanusa',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada III',kodaeral:'Kodaeral VIII (Manado)',perbatasan:'Filipina',perairan:'Laut Filipina'},
+  {code:'058A',td:'058A',epoch:'2021.0',latitude:4.643889,longitude:127.163611,region:'Sulut',district:'Kep. Talaud',location_desc:'P. Intata',block_code:'Nanusa',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada III',kodaeral:'Kodaeral VIII (Manado)',perbatasan:'Filipina, Palau',perairan:'Laut Filipina'},
+  {code:'058',td:'058',epoch:'2021.0',latitude:4.626667,longitude:127.164722,region:'Sulut',district:'Kep. Talaud',location_desc:'P. Kakarutan',block_code:'Nanusa',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada III',kodaeral:'Kodaeral VIII (Manado)',perbatasan:'Filipina, Palau',perairan:'Laut Filipina'},
+  {code:'059',td:'059',epoch:'2012.0',latitude:3.753611,longitude:126.851667,region:'Sulut',district:'Kep. Talaud',location_desc:'Tg. Tampida',block_code:'Damau Bowone',condition_status:'repair',tilt_degree:0,notes:'Rusak',koarmada:'Koarmada II',kodaeral:'Kodaeral VIII (Manado)',perbatasan:'Palau',perairan:'Laut Maluku'},
+  {code:'060',td:'060',epoch:'2012.0',latitude:2.645556,longitude:128.574167,region:'Malut',district:'Pulau Morotai',location_desc:'Tg. Sopi, P. Morotai',block_code:'Morotai Jaya',condition_status:'repair',tilt_degree:0,notes:'Rusak',koarmada:'Koarmada III',kodaeral:'Kodaeral IX (Ambon)',perbatasan:'Palau',perairan:'Laut Filipina'},
+  {code:'061C',td:'061C',epoch:'2021.0',latitude:2.506444,longitude:128.687472,region:'Malut',district:'Pulau Morotai',location_desc:'P. Morotai',block_code:'Morotai Utara',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada III',kodaeral:'Kodaeral IX (Ambon)',perbatasan:'Palau',perairan:'Samudra Pasifik Utara'},
+  {code:'062',td:'062',epoch:'2012.0',latitude:1.578889,longitude:128.737222,region:'Malut',district:'Halmahera Timur',location_desc:'Tg.Lelai',block_code:'Maba Utara',condition_status:'repair',tilt_degree:0,notes:'Rusak',koarmada:'Koarmada III',kodaeral:'Kodaeral IX (Ambon)',perbatasan:'Palau',perairan:'Laut Halmahera'},
+  {code:'063',td:'063',epoch:'2021.0',latitude:0.7275,longitude:129.141667,region:'Malut',district:'Halmahera Tengah',location_desc:'P. Jiew',block_code:'Patani Utara',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada III',kodaeral:'Kodaeral IX (Ambon)',perbatasan:'Palau',perairan:'Laut Halmahera'},
+  {code:'065',td:'065',epoch:'2013.0',latitude:0.535556,longitude:130.731111,region:'Papua Barat',district:'Raja Ampat',location_desc:'P. Budd',block_code:'Ayau',condition_status:'repair',tilt_degree:0,notes:'Rusak',koarmada:'Koarmada III',kodaeral:'Kodaeral XIV (Sorong)',perbatasan:'Palau',perairan:'Samudra Pasifik Utara'},
+  {code:'066',td:'066',epoch:'2013.0',latitude:1.088889,longitude:131.259722,region:'Papua Barat',district:'Raja Ampat',location_desc:'P. Fani',block_code:'Ayau',condition_status:'relocate',tilt_degree:0,notes:'Hilang',koarmada:'Koarmada III',kodaeral:'Kodaeral XIV (Sorong)',perbatasan:'Palau',perairan:'Samudra Pasifik Utara'},
+  {code:'070',td:'070',epoch:'2013.0',latitude:-0.337778,longitude:132.159444,region:'Papua Barat',district:'Tambrauw',location_desc:'Pulau Miossu',block_code:'Sausapor',condition_status:'relocate',tilt_degree:0,notes:'Hilang',koarmada:'Koarmada III',kodaeral:'Kodaeral XIV (Sorong)',perbatasan:'Palau',perairan:'Samudra Pasifik Selatan'},
+  {code:'070A',td:'070A',epoch:'2021.0',latitude:-0.342778,longitude:132.422222,region:'Papua Barat',district:'Tambrauw',location_desc:'Tg. Yamursba',block_code:'Abun',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada III',kodaeral:'Kodaeral XIV (Sorong)',perbatasan:'Palau',perairan:'Samudra Pasifik Selatan'},
+  {code:'071',td:'071',epoch:'2013.0',latitude:-0.361667,longitude:132.716944,region:'Papua Barat',district:'Tambrauw',location_desc:'Tg. Wasio',block_code:'Abun',condition_status:'repair',tilt_degree:0,notes:'Rusak',koarmada:'Koarmada III',kodaeral:'Kodaeral XIV (Sorong)',perbatasan:'Palau',perairan:'Samudra Pasifik Selatan'},
+  {code:'072',td:'072',epoch:'2021.0',latitude:0.939444,longitude:134.295556,region:'Papua',district:'Supiori',location_desc:'Pulau Fanildo',block_code:'Supiori Barat',condition_status:'repair',tilt_degree:0,notes:'Rusak',koarmada:'Koarmada III',kodaeral:'Kodaeral X (Jayapura)',perbatasan:'Palau',perairan:'Samudra Pasifik Utara'},
+  {code:'074',td:'074',epoch:'2014.0',latitude:-0.393889,longitude:135.274167,region:'Papua',district:'Biak Numfor',location_desc:'Pulau Bepondi',block_code:'Supiori Utara',condition_status:'repair',tilt_degree:0,notes:'Rusak',koarmada:'Koarmada III',kodaeral:'Kodaeral X (Jayapura)',perbatasan:'Tidak Berbatasan',perairan:'Samudra Pasifik Selatan'},
+  {code:'076B',td:'077',epoch:'2021.0',latitude:-0.698889,longitude:135.855833,region:'Papua',district:'Biak Numfor',location_desc:'Tg. Wasanbari/ Tg. Barari',block_code:'Oridek',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada III',kodaeral:'Kodaeral X (Jayapura)',perbatasan:'Tidak Berbatasan',perairan:'Samudra Pasifik Selatan'},
+  {code:'078',td:'078',epoch:'2014.0',latitude:-1.456389,longitude:137.930833,region:'Papua',district:'Mamberamo Raya',location_desc:'Tg. Narwaku',block_code:'Mamberamo Ilir',condition_status:'relocate',tilt_degree:0,notes:'Hilang',koarmada:'Koarmada III',kodaeral:'Kodaeral X (Jayapura)',perbatasan:'Tidak Berbatasan',perairan:'Samudra Pasifik Selatan'},
+  {code:'079',td:'079',epoch:'2014.0',latitude:-1.573889,longitude:138.715833,region:'Papua',district:'Sarmi',location_desc:'P. Liki',block_code:'',condition_status:'repair',tilt_degree:0,notes:'Rusak',koarmada:'Koarmada III',kodaeral:'Kodaeral X (Jayapura)',perbatasan:'PNG',perairan:'Samudra Pasifik Selatan'},
+  {code:'080',td:'080',epoch:'2014.0',latitude:-2.32,longitude:140.151944,region:'Papua',district:'Jayapura',location_desc:'Tg. Kamdara',block_code:'Distrik Demta',condition_status:'repair',tilt_degree:0,notes:'Rusak',koarmada:'Koarmada III',kodaeral:'Kodaeral X (Jayapura)',perbatasan:'PNG',perairan:'Samudra Pasifik Selatan'},
+  {code:'080A',td:'080A',epoch:'2014.0',latitude:-2.439389,longitude:140.613056,region:'Papua',district:'Jayapura',location_desc:'Tg. Ormu',block_code:'Nehibe',condition_status:'repair',tilt_degree:0,notes:'Rusak',koarmada:'Koarmada III',kodaeral:'Kodaeral X (Jayapura)',perbatasan:'PNG',perairan:'Samudra Pasifik Selatan'},
+  {code:'081',td:'081',epoch:'2014.0',latitude:-2.604444,longitude:141.0,region:'Papua',district:'Jayapura',location_desc:'Tg. Oinake',block_code:'Muara Tami',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada III',kodaeral:'Kodaeral X (Jayapura)',perbatasan:'PNG',perairan:'Samudra Pasifik Selatan'},
+  {code:'082',td:'082',epoch:'2015.0',latitude:-9.127778,longitude:141.019444,region:'Papua',district:'Merauke',location_desc:'S. Torasi',block_code:'Naukenjerai',condition_status:'relocate',tilt_degree:0,notes:'Hilang',koarmada:'Koarmada III',kodaeral:'Kodaeral XI (Merauke)',perbatasan:'PNG',perairan:'Laut Aru'},
+  {code:'083',td:'083',epoch:'2015.0',latitude:-9.095,longitude:140.849444,region:'Papua',district:'Merauke',location_desc:'S. Blatar',block_code:'Merauke',condition_status:'repair',tilt_degree:0,notes:'Rusak',koarmada:'Koarmada III',kodaeral:'Kodaeral XI (Merauke)',perbatasan:'PNG',perairan:'Laut Aru'},
+  {code:'085',td:'085',epoch:'2015.0',latitude:-8.269722,longitude:139.436389,region:'Papua',district:'Merauke',location_desc:'Kr. Sametinke',block_code:'Malind',condition_status:'relocate',tilt_degree:0,notes:'Hilang',koarmada:'Koarmada III',kodaeral:'Kodaeral XI (Merauke)',perbatasan:'PNG',perairan:'Laut Aru'},
+  {code:'086',td:'086',epoch:'2021.0',latitude:-8.435833,longitude:138.906389,region:'Papua',district:'Merauke',location_desc:'Ug. Komoran',block_code:'Okaba',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada III',kodaeral:'Kodaeral XI (Merauke)',perbatasan:'Australia',perairan:'Laut Aru'},
+  {code:'087',td:'088',epoch:'2021.0',latitude:-8.4595,longitude:137.674,region:'Papua',district:'Merauke',location_desc:'Ug. Salah, Pulau Kolempom',block_code:'Waan',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada III',kodaeral:'Kodaeral XI (Merauke)',perbatasan:'Australia',perairan:'Laut Aru'},
+  {code:'090',td:'090',epoch:'2021.0',latitude:-6.358611,longitude:138.399722,region:'Papua',district:'Asmat',location_desc:'S.Cook',block_code:'Atsy',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada III',kodaeral:'Kodaeral XI (Merauke)',perbatasan:'Australia',perairan:'Laut Aru'},
+  {code:'091',td:'091',epoch:'2021.0',latitude:-5.979167,longitude:138.056111,region:'Papua',district:'Asmat',location_desc:'Gosong Triton',block_code:'Atsy',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada III',kodaeral:'Kodaeral X (Jayapura)',perbatasan:'Australia',perairan:'Laut Aru'},
+  {code:'092',td:'092',epoch:'2021.0',latitude:-5.387222,longitude:137.718611,region:'Papua',district:'Asmat',location_desc:'Pulau Laag',block_code:'Sawa Erma',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada III',kodaeral:'Kodaeral X (Jayapura)',perbatasan:'Australia',perairan:'Laut Aru'},
+  {code:'093',td:'093',epoch:'2015.0',latitude:-4.906667,longitude:136.759722,region:'Papua',district:'Mimika',location_desc:'Tg. Pohonbatu',block_code:'Mimika Timur',condition_status:'relocate',tilt_degree:0,notes:'Hilang',koarmada:'Koarmada III',kodaeral:'Kodaeral X (Jayapura)',perbatasan:'Australia',perairan:'Laut Aru'},
+  {code:'094',td:'094',epoch:'2021.0',latitude:-4.644722,longitude:136.120556,region:'Papua',district:'Mimika',location_desc:'Amarapya',block_code:'Mimika Barat',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada III',kodaeral:'Kodaeral X (Jayapura)',perbatasan:'Australia',perairan:'Laut Aru'},
+  {code:'097A',td:'097A',epoch:'2021.0',latitude:-5.595,longitude:134.818056,region:'Maluku',district:'Kepulauan Aru',location_desc:'P. Ararkula',block_code:'Aru utara',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada III',kodaeral:'Kodaeral IX (Ambon)',perbatasan:'Australia',perairan:'Laut Aru'},
+  {code:'098',td:'098',epoch:'2021.0',latitude:-6.0025,longitude:134.905556,region:'Maluku',district:'Kepulauan Aru',location_desc:'P. Karaweira Br',block_code:'Aru tengah timur',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada III',kodaeral:'Kodaeral IX (Ambon)',perbatasan:'Australia',perairan:'Laut Aru'},
+  {code:'099',td:'099',epoch:'2021.0',latitude:-6.323889,longitude:134.914722,region:'Maluku',district:'Kepulauan Aru',location_desc:'P. Panambulai',block_code:'Aru tengah selatan',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada III',kodaeral:'Kodaeral IX (Ambon)',perbatasan:'Australia',perairan:'Laut Aru'},
+  {code:'100',td:'100',epoch:'2016.0',latitude:-6.831667,longitude:134.787222,region:'Maluku',district:'Kepulauan Aru',location_desc:'P. Kultubai Selatan',block_code:'Aru tengah selatan',condition_status:'relocate',tilt_degree:0,notes:'Hilang Abrasi',koarmada:'Koarmada III',kodaeral:'Kodaeral IX (Ambon)',perbatasan:'Australia',perairan:'Laut Aru'},
+  {code:'100A',td:'100A',epoch:'2016.0',latitude:-7.018889,longitude:134.690556,region:'Maluku',district:'Kepulauan Aru',location_desc:'P. Karang',block_code:'Aru tengah selatan',condition_status:'relocate',tilt_degree:0,notes:'Hilang Abrasi',koarmada:'Koarmada III',kodaeral:'Kodaeral IX (Ambon)',perbatasan:'Australia',perairan:'Laut Aru'},
+  {code:'102',td:'102',epoch:'2021.0',latitude:-6.950278,longitude:134.193889,region:'Maluku',district:'Kepulauan Aru',location_desc:'P. Batugoyang',block_code:'Aru selatan timur',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada III',kodaeral:'Kodaeral IX (Ambon)',perbatasan:'Australia',perairan:'Laut Aru'},
+  {code:'103',td:'103',epoch:'2021.0',latitude:-6.007139,longitude:132.844611,region:'Maluku',district:'Maluku Tenggara',location_desc:'Tg. Weduar',block_code:'Kei Besar Sel',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada III',kodaeral:'Kodaeral IX (Ambon)',perbatasan:'Australia',perairan:'Laut Banda'},
+  {code:'104',td:'104',epoch:'2021.0',latitude:-7.238889,longitude:131.980278,region:'Maluku',district:'Kepulauan Tanimbar',location_desc:'P. Larat',block_code:'Tanimbar Utara',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada III',kodaeral:'Kodaeral IX (Ambon)',perbatasan:'Australia',perairan:'Laut Aru'},
+  {code:'105',td:'105',epoch:'2023.0',latitude:-8.051944,longitude:131.300556,region:'Maluku',district:'Maluku Tenggara Barat',location_desc:'P. Asutubun',block_code:'Tanimbar Selatan',condition_status:'maintenance',tilt_degree:0,notes:'Rusak Ringan',koarmada:'Koarmada III',kodaeral:'Kodaeral IX (Ambon)',perbatasan:'Australia',perairan:'Laut Aru'},
+  {code:'106',td:'106',epoch:'2023.0',latitude:-8.171389,longitude:131.125278,region:'Maluku',district:'Kepulauan Tanimbar',location_desc:'P. Selaru Timur',block_code:'Selaru',condition_status:'repair',tilt_degree:0,notes:'Rusak Berat',koarmada:'Koarmada III',kodaeral:'Kodaeral IX (Ambon)',perbatasan:'Australia',perairan:'Laut Aru'},
+  {code:'107',td:'107',epoch:'2017.0',latitude:-8.341472,longitude:130.822861,region:'Maluku',district:'Kepulauan Tanimbar',location_desc:'P. Batarkusu',block_code:'Selaru',condition_status:'maintenance',tilt_degree:0,notes:'Rusak Ringan',koarmada:'Koarmada III',kodaeral:'Kodaeral IX (Ambon)',perbatasan:'Australia',perairan:'Laut Arafura'},
+  {code:'108',td:'108',epoch:'2021.0',latitude:-8.224722,longitude:129.825556,region:'Maluku',district:'Maluku Barat Daya',location_desc:'P. Marsela',block_code:'P. Masela',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada III',kodaeral:'Kodaeral IX (Ambon)',perbatasan:'Australia',perairan:'Laut Banda'},
+  {code:'109',td:'109',epoch:'2017.0',latitude:-8.3525,longitude:128.514444,region:'Maluku',district:'Maluku Barat Daya',location_desc:'P. Meatimearang',block_code:'Mndona Hiera',condition_status:'relocate',tilt_degree:0,notes:'Hilang',koarmada:'Koarmada III',kodaeral:'Kodaeral IX (Ambon)',perbatasan:'Australia, RDTL',perairan:'Laut Timor'},
+  {code:'110',td:'110',epoch:'2023.0',latitude:-8.23825,longitude:127.635167,region:'Maluku',district:'Maluku Barat Daya',location_desc:'Tg. Karang, P.Leti',block_code:'Letti',condition_status:'normal',tilt_degree:0,notes:'Baik',koarmada:'Koarmada III',kodaeral:'Kodaeral IX (Ambon)',perbatasan:'Australia, RDTL',perairan:'Laut Banda'},
+  {code:'111',td:'111',epoch:'2021.0',latitude:-8.10525,longitude:127.157972,region:'Maluku',district:'Maluku Barat Daya',location_desc:'Tutun Yen, P.Kaisar',block_code:'Kisar Utara',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada III',kodaeral:'Kodaeral IX (Ambon)',perbatasan:'Australia, RDTL',perairan:'Selat Wetar'},
+  {code:'112',td:'112',epoch:'2021.0',latitude:-7.975278,longitude:126.466389,region:'Maluku',district:'Maluku Barat Daya',location_desc:'Tutun Eden, P.Wetar',block_code:'Wetar Timur',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada III',kodaeral:'Kodaeral IX (Ambon)',perbatasan:'Australia, RDTL',perairan:'Selat Wetar'},
+  {code:'112A',td:'112A',epoch:'2024.0',latitude:-8.062222,longitude:125.735,region:'Maluku',district:'Maluku Barat Daya',location_desc:'P. Lirang',block_code:'Wetar Barat',condition_status:'normal',tilt_degree:0,notes:'Baik',koarmada:'Koarmada III',kodaeral:'Kodaeral VII (Kupang)',perbatasan:'Australia, RDTL',perairan:'Selat Wetar'},
+  {code:'113',td:'113',epoch:'2021.0',latitude:-8.317778,longitude:125.140278,region:'NTT',district:'Alor',location_desc:'Tg.Lisomu, P.Alor',block_code:'Alor Barat Daya',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada III',kodaeral:'Kodaeral VII (Kupang)',perbatasan:'Australia, RDTL',perairan:'Selat Ombai'},
+  {code:'113A',td:'113A',epoch:'2021.0',latitude:-8.357222,longitude:125.060278,region:'NTT',district:'Alor',location_desc:'Tg.Seromu, P.Alor',block_code:'Alor Barat Daya',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada III',kodaeral:'Kodaeral VII (Kupang)',perbatasan:'Australia, RDTL',perairan:'Selat Ombai'},
+  {code:'114A',td:'114A',epoch:'2021.0',latitude:-9.462278,longitude:125.087861,region:'NTT',district:'Malaka',location_desc:'Muara Motamasi, P. Timor',block_code:'Motamasin',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada III',kodaeral:'Kodaeral VII (Kupang)',perbatasan:'Australia, RDTL',perairan:'Laut Timor'},
+  {code:'115',td:'115',epoch:'2018.0',latitude:-9.635833,longitude:124.994167,region:'NTT',district:'Malaka',location_desc:'Tg. Wetoh, P. Timor',block_code:'Malaka Tengah',condition_status:'relocate',tilt_degree:0,notes:'Hilang',koarmada:'Koarmada II',kodaeral:'Kodaeral VII (Kupang)',perbatasan:'Australia, RDTL',perairan:'Laut Timor'},
+  {code:'116',td:'116',epoch:'2021.0',latitude:-9.882778,longitude:124.75,region:'NTT',district:'Timor tengah selatan',location_desc:'Tg. Batu Merah, P. Timor',block_code:'Boking',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral VII (Kupang)',perbatasan:'Australia, RDTL',perairan:'Laut Timor'},
+  {code:'117',td:'117',epoch:'2021.0',latitude:-10.120556,longitude:124.483056,region:'NTT',district:'Timor tengah selatan',location_desc:'Tg. Haekmeo, P. Timor',block_code:'Kualin',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral VII (Kupang)',perbatasan:'Australia, RDTL',perairan:'Laut Timor'},
+  {code:'117B',td:'118',epoch:'2021.0',latitude:-10.161472,longitude:124.417917,region:'NTT',district:'Timor tengah selatan',location_desc:'Pulau Timor',block_code:'Kolbano',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral VII (Kupang)',perbatasan:'Australia, RDTL',perairan:'Laut Timor'},
+  {code:'120',td:'120',epoch:'2021.0',latitude:-10.829722,longitude:123.222778,region:'NTT',district:'Kupang',location_desc:'Tg. Puleh',block_code:'Amarasi Tim',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral VII (Kupang)',perbatasan:'Australia',perairan:'Laut Timor'},
+  {code:'121',td:'121',epoch:'2021.0',latitude:-11.01,longitude:122.876944,region:'NTT',district:'Rote Ndao',location_desc:'P. Dana',block_code:'Rote Barat Daya',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral VII (Kupang)',perbatasan:'Australia',perairan:'Samudra Hindia'},
+  {code:'122',td:'122',epoch:'2021.0',latitude:-10.626944,longitude:121.8375,region:'NTT',district:'Sabu Raijua',location_desc:'Tg. Merebu',block_code:'Dainao',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral VII (Kupang)',perbatasan:'Australia',perairan:'Laut Sawu'},
+  {code:'123',td:'123',epoch:'2021.0',latitude:-10.833333,longitude:121.2825,region:'NTT',district:'Sabu Raijua',location_desc:'Pulau Dana',block_code:'Raijua',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral VII (Kupang)',perbatasan:'Australia',perairan:'Samudra Hindia'},
+  {code:'124',td:'124',epoch:'2021.0',latitude:-10.317222,longitude:120.453611,region:'NTT',district:'Sumba Timur',location_desc:'Tg. Ngunju',block_code:'Wulla Waijelu',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral VII (Kupang)',perbatasan:'Australia',perairan:'Laut Sawu'},
+  {code:'125',td:'125',epoch:'2021.0',latitude:-10.339444,longitude:120.117222,region:'NTT',district:'Sumba Timur',location_desc:'P. Mangudu',block_code:'Karera',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral VII (Kupang)',perbatasan:'Australia',perairan:'Samudra Hindia'},
+  {code:'128B',td:'128B',epoch:'2021.0',latitude:-9.698611,longitude:119.0575,region:'NTT',district:'Sumba Barat Daya',location_desc:'Tg. Merapu, P. Sumba',block_code:'Kodi Bangedo',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral VII (Kupang)',perbatasan:'Australia',perairan:'Samudra Hindia'},
+  {code:'128',td:'128',epoch:'2021.0',latitude:-9.562778,longitude:118.924722,region:'NTT',district:'Sumba Barat Daya',location_desc:'Tg. Karoso, P. Sumba',block_code:'Kodi',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral VII (Kupang)',perbatasan:'Australia',perairan:'Samudra Hindia'},
+  {code:'129',td:'129',epoch:'2021.0',latitude:-8.889444,longitude:118.467222,region:'NTB',district:'Sumbawa',location_desc:'Tg. Karoso, P. Sumba',block_code:'Lunyuk',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral VII (Kupang)',perbatasan:'Tidak Berbatasan',perairan:'Selat Sumba'},
+  {code:'130A',td:'130A',epoch:'2021.0',latitude:-9.104444,longitude:117.057389,region:'NTB',district:'Sumbawa Barat',location_desc:'Tg. Talonan',block_code:'Sekongkang',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral V (Surabaya)',perbatasan:'Tidak Berbatasan',perairan:'Samudra Hindia'},
+  {code:'131',td:'131',epoch:'2021.0',latitude:-8.922722,longitude:116.001917,region:'NTB',district:'Lombok barat',location_desc:'P. Sophialouisa',block_code:'Sekotong',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral V (Surabaya)',perbatasan:'Tidak Berbatasan',perairan:'Samudra Hindia'},
+  {code:'133',td:'133',epoch:'2021.0',latitude:-8.819722,longitude:115.586944,region:'Bali',district:'Klungkung',location_desc:'Tg. Sedihing',block_code:'Nusa Penida',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral V (Surabaya)',perbatasan:'Tidak Berbatasan',perairan:'Samudra Hindia'},
+  {code:'134A',td:'134A',epoch:'2018.0',latitude:-8.851667,longitude:115.175556,region:'Bali',district:'Badung',location_desc:'Tg. Ungasan',block_code:'Kuta selatan',condition_status:'relocate',tilt_degree:0,notes:'Hilang',koarmada:'Koarmada II',kodaeral:'Kodaeral V (Surabaya)',perbatasan:'Tidak Berbatasan',perairan:'Samudra Hindia'},
+  {code:'134',td:'134',epoch:'2021.0',latitude:-8.848889,longitude:115.108611,region:'Bali',district:'Badung',location_desc:'Tg. Mebulu',block_code:'Kuta selatan',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral V (Surabaya)',perbatasan:'Tidak Berbatasan',perairan:'Samudra Hindia'},
+  {code:'135',td:'135',epoch:'2019.0',latitude:-8.787222,longitude:114.525833,region:'Jawa Timur',district:'Banyuwangi',location_desc:'Tg. Bantenan',block_code:'Tegaldlimo',condition_status:'relocate',tilt_degree:0,notes:'Hilang',koarmada:'Koarmada II',kodaeral:'Kodaeral V (Surabaya)',perbatasan:'Tidak Berbatasan',perairan:'Samudra Hindia'},
+  {code:'138',td:'138',epoch:'2021.0',latitude:-8.508333,longitude:113.293611,region:'Jawa Timur',district:'Jembe',location_desc:'P. Barung',block_code:'Puger',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral V (Surabaya)',perbatasan:'Tidak Berbatasan',perairan:'Samudra Hindia'},
+  {code:'139',td:'139',epoch:'2021.0',latitude:-8.406667,longitude:111.708611,region:'Jawa Timur',district:'Trenggalek',location_desc:'P. Sekel',block_code:'Watulimo',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral V (Surabaya)',perbatasan:'Australia',perairan:'Samudra Hindia'},
+  {code:'140',td:'140',epoch:'2021.0',latitude:-8.200833,longitude:110.708611,region:'Jogja',district:'Gunung Kidul',location_desc:'Tg. Batur',block_code:'Girisubo',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral V (Surabaya)',perbatasan:'Australia',perairan:'Samudra Hindia'},
+  {code:'141',td:'141',epoch:'2021.0',latitude:-8.101389,longitude:110.438889,region:'Jawa tengah',district:'Gunung Kidul',location_desc:'Tg. Ngeres Langu',block_code:'Tepus',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada II',kodaeral:'Kodaeral V (Surabaya)',perbatasan:'Australia',perairan:'Samudra Hindia'},
+  {code:'142',td:'142',epoch:'2021.0',latitude:-7.779278,longitude:109.411472,region:'Jawa tengah',district:'Kebumen',location_desc:'Batu Tugur, P. Selo',block_code:'Ayah',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral III (Jakarta)',perbatasan:'Australia',perairan:'Samudra Hindia'},
+  {code:'143A',td:'143A',epoch:'2021.0',latitude:-7.821056,longitude:108.439139,region:'Jawa Barat',district:'Pangandaran',location_desc:'Legokjawa, Pulau Jawa',block_code:'Cimerak',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral III (Jakarta)',perbatasan:'Australia',perairan:'Samudra Hindia'},
+  {code:'144C',td:'144C',epoch:'2021.0',latitude:-7.821194,longitude:108.323111,region:'Jawa Barat',district:'Tasikmalaya',location_desc:'P. Nusamanuk',block_code:'Cikalong',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral III (Jakarta)',perbatasan:'Australia',perairan:'Samudra Hindia'},
+  {code:'145',td:'145',epoch:'2021.0',latitude:-7.742222,longitude:107.842222,region:'Jawa Barat',district:'Garut',location_desc:'Tg. Gedeh',block_code:'Cibalong',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral III (Jakarta)',perbatasan:'Australia',perairan:'Samudra Hindia'},
+  {code:'146',td:'146',epoch:'2019.0',latitude:-7.388889,longitude:106.403889,region:'Jawa Barat',district:'Sukabumi',location_desc:'Ug. Genteng',block_code:'Ciracap',condition_status:'relocate',tilt_degree:0,notes:'Hilang',koarmada:'Koarmada I',kodaeral:'Kodaeral III (Jakarta)',perbatasan:'Australia',perairan:'Samudra Hindia'},
+  {code:'147',td:'147',epoch:'2021.0',latitude:-7.016667,longitude:105.523611,region:'Banten',district:'Pandeglang',location_desc:'P. Deli',block_code:'Cikeusik',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral III (Jakarta)',perbatasan:'Australia',perairan:'Samudra Hindia'},
+  {code:'148A',td:'148A',epoch:'2021.0',latitude:-6.854722,longitude:105.262222,region:'Banten',district:'Pandeglang',location_desc:'Karang Pabayang',block_code:'Ujung Kulon',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral III (Jakarta)',perbatasan:'Australia',perairan:'Samudra Hindia'},
+  {code:'151',td:'151',epoch:'2019.0',latitude:-5.895833,longitude:104.440556,region:'Lampung',district:'Pesisir Barat',location_desc:'P. Bertuah',block_code:'Bengkunat',condition_status:'relocate',tilt_degree:0,notes:'Hilang',koarmada:'Koarmada I',kodaeral:'Kodaeral III (Jakarta)',perbatasan:'Australia',perairan:'Samudra Hindia'},
+  {code:'152',td:'152',epoch:'2019.0',latitude:-5.239444,longitude:103.915833,region:'Lampung',district:'Lampung Barat',location_desc:'Ug. Walor',block_code:'Krui Selatan',condition_status:'relocate',tilt_degree:0,notes:'Hilang',koarmada:'Koarmada I',kodaeral:'Kodaeral III (Jakarta)',perbatasan:'Tidak Berbatasan',perairan:'Samudra Hindia'},
+  {code:'154A',td:'154A',epoch:'2021.0',latitude:-5.513889,longitude:102.353056,region:'Bengkulu',district:'Bengkulu Utara',location_desc:'Tg. Kahoabi',block_code:'Enggano',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral II (Padang)',perbatasan:'Tidak Berbatasan',perairan:'Samudra Hindia'},
+  {code:'154',td:'154',epoch:'2021.0',latitude:-5.520278,longitude:102.266667,region:'Bengkulu',district:'Bengkulu Utara',location_desc:'Tg. Labuho',block_code:'Enggano',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral II (Padang)',perbatasan:'Tidak Berbatasan',perairan:'Samudra Hindia'},
+  {code:'155',td:'155',epoch:'2021.0',latitude:-5.359722,longitude:102.084444,region:'Bengkulu',district:'Bengkulu Utara',location_desc:'Tg. Kooma',block_code:'Enggano',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral II (Padang)',perbatasan:'Tidak Berbatasan',perairan:'Samudra Hindia'},
+  {code:'156',td:'156',epoch:'2019.0',latitude:-4.02,longitude:101.030278,region:'Sumatera Barat',district:'Kepulauan Mentawai',location_desc:'P. Mega',block_code:'Pagai Selatan',condition_status:'repair',tilt_degree:0,notes:'Rusak',koarmada:'Koarmada I',kodaeral:'Kodaeral II (Padang)',perbatasan:'Tidak Berbatasan',perairan:'Samudra Hindia'},
+  {code:'158',td:'158',epoch:'2019.0',latitude:-3.296667,longitude:100.329722,region:'Sumatera Barat',district:'Kepulauan Mentawai',location_desc:'P. Sibarubaru',block_code:'Pagai Selatan',condition_status:'repair',tilt_degree:0,notes:'Rusak',koarmada:'Koarmada I',kodaeral:'Kodaeral II (Padang)',perbatasan:'Tidak Berbatasan',perairan:'Samudra Hindia'},
+  {code:'159',td:'159',epoch:'2020.0',latitude:-2.837222,longitude:99.998611,region:'Sumatera Barat',district:'Kepulauan Mentawai',location_desc:'Tg. Betumonga',block_code:'Pagai Utara',condition_status:'relocate',tilt_degree:0,notes:'Hilang',koarmada:'Koarmada I',kodaeral:'Kodaeral II (Padang)',perbatasan:'Tidak Berbatasan',perairan:'Samudra Hindia'},
+  {code:'161',td:'161',epoch:'2020.0',latitude:-1.866111,longitude:99.076111,region:'Sumatera Barat',district:'Kepulauan Mentawai',location_desc:'P. Sinyaunyau',block_code:'Seberut Bar. Daya',condition_status:'maintenance',tilt_degree:0,notes:'Rusak Ringan',koarmada:'Koarmada I',kodaeral:'Kodaeral II (Padang)',perbatasan:'Tidak Berbatasan',perairan:'Samudra Hindia'},
+  {code:'161B',td:'161B',epoch:'2020.0',latitude:-1.678611,longitude:98.876389,region:'Sumatera Barat',district:'Kepulauan Mentawai',location_desc:'Tanjung Simansih, Pulau Siberut',block_code:'Seberut Barat',condition_status:'relocate',tilt_degree:0,notes:'Hilang',koarmada:'Koarmada I',kodaeral:'Kodaeral II (Padang)',perbatasan:'Tidak Berbatasan',perairan:'Samudra Hindia'},
+  {code:'161C',td:'161C',epoch:'2021.0',latitude:-1.623917,longitude:98.823972,region:'Sumatera Barat',district:'Kepulauan Mentawai',location_desc:'Tanjung Simasuket, Pulau Siberut',block_code:'Seberut Barat',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral II (Padang)',perbatasan:'Tidak Berbatasan',perairan:'Samudra Hindia'},
+  {code:'162',td:'162',epoch:'2020.0',latitude:-1.225556,longitude:98.601944,region:'Sumatera Barat',district:'Kepulauan Mentawai',location_desc:'Tg. Sakaladat, Pulau Siberut',block_code:'Seberut Barat',condition_status:'relocate',tilt_degree:0,notes:'Hilang',koarmada:'Koarmada I',kodaeral:'Kodaeral II (Padang)',perbatasan:'Tidak Berbatasan',perairan:'Samudra Hindia'},
+  {code:'164B',td:'164B',epoch:'2021.0',latitude:-0.0925,longitude:97.853889,region:'Sumut',district:'Nias Selatan',location_desc:'P. Simuk',block_code:'Simuk',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral II (Padang)',perbatasan:'Tidak Berbatasan',perairan:'Samudra Hindia'},
+  {code:'165',td:'165',epoch:'2021.0',latitude:0.866556,longitude:97.281083,region:'Sumut',district:'Nias Barat',location_desc:'Pulau Heruwanga',block_code:'Sirombu',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral II (Padang)',perbatasan:'Tidak Berbatasan',perairan:'Samudra Hindia'},
+  {code:'168',td:'168',epoch:'2021.0',latitude:1.408278,longitude:97.056833,region:'Sumut',district:'Nias Utara',location_desc:'Tg. Toyolawa',block_code:'Lahewa',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral II (Padang)',perbatasan:'Tidak Berbatasan',perairan:'Samudra Hindia'},
+  {code:'170',td:'170',epoch:'2021.0',latitude:2.529722,longitude:95.918056,region:'Aceh',district:'Simeulue',location_desc:'P. Simeulucut',block_code:'Simeulue Tengah',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral I (Belawan)',perbatasan:'Tidak Berbatasan',perairan:'Samudra Hindia'},
+  {code:'171',td:'171',epoch:'2022.0',latitude:2.964278,longitude:95.392667,region:'Aceh',district:'Simeulue',location_desc:'P. Salaut Besar',block_code:'Alafan',condition_status:'maintenance',tilt_degree:0,notes:'Tidak dapat disurvey',koarmada:'Koarmada I',kodaeral:'Kodaeral I (Belawan)',perbatasan:'Tidak Berbatasan',perairan:'Samudra Hindia'},
+  {code:'171C',td:'171C',epoch:'2021.0',latitude:2.9825,longitude:95.385,region:'Aceh',district:'Simeulue',location_desc:'P. Salaut Besar',block_code:'Alafan',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral I (Belawan)',perbatasan:'Tidak Berbatasan',perairan:'Samudra Hindia'},
+  {code:'174',td:'174',epoch:'2022.0',latitude:4.875833,longitude:95.362778,region:'Aceh',district:'Aceh Jaya',location_desc:'P. Mane',block_code:'Sampoiniet',condition_status:'maintenance',tilt_degree:0,notes:'Rusak Ringan',koarmada:'Koarmada I',kodaeral:'Kodaeral I (Belawan)',perbatasan:'India',perairan:'Samudra Hindia'},
+  {code:'175',td:'175',epoch:'2021.0',latitude:5.276111,longitude:95.201944,region:'Aceh',district:'Aceh Besar',location_desc:'P. Rusa',block_code:'Kareung',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral I (Belawan)',perbatasan:'India',perairan:'Samudra Hindia'},
+  {code:'176A',td:'176A',epoch:'2022.0',latitude:5.792056,longitude:94.971917,region:'Aceh',district:'Aceh Besar',location_desc:'P. Lungkap Cut / P. Benggala',block_code:'Pulo Aceh',condition_status:'repair',tilt_degree:0,notes:'Rusak Berat',koarmada:'Koarmada I',kodaeral:'Kodaeral I (Belawan)',perbatasan:'India',perairan:'Samudra Hindia'},
+  {code:'177',td:'177',epoch:'2021.0',latitude:6.075083,longitude:95.112139,region:'Aceh',district:'Kota Sabang',location_desc:'P. Rondo',block_code:'Sukajaya',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral I (Belawan)',perbatasan:'India & Thailand',perairan:'Laut Andaman'},
+  {code:'178',td:'178',epoch:'2021.0',latitude:5.898111,longitude:95.336694,region:'Aceh',district:'Kota Sabang',location_desc:'Pantai Jaya, Pulau Weh',block_code:'Sukajaya',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral I (Belawan)',perbatasan:'Thailand',perairan:'Laut Andaman'},
+  {code:'179',td:'179',epoch:'2022.0',latitude:5.50775,longitude:95.882639,region:'Aceh',district:'Pidie',location_desc:'Ujong Kuala Sagi, Pulau Sumatera',block_code:'Muara Tiga',condition_status:'repair',tilt_degree:0,notes:'Rusak Berat',koarmada:'Koarmada I',kodaeral:'Kodaeral I (Belawan)',perbatasan:'Thailand',perairan:'Laut Andaman'},
+  {code:'180',td:'180',epoch:'2022.0',latitude:5.277306,longitude:96.849167,region:'Aceh',district:'Jangka',location_desc:'Kuala Cerape, Pulau Sumatera',block_code:'Alue Kuta',condition_status:'relocate',tilt_degree:0,notes:'Hilang',koarmada:'Koarmada I',kodaeral:'Kodaeral I (Belawan)',perbatasan:'Thailand',perairan:'Laut Andaman'},
+  {code:'181',td:'181',epoch:'2022.0',latitude:5.251361,longitude:97.501056,region:'Aceh',district:'Aceh Utara',location_desc:'Tg Jamboaye, Pulau Sumatera',block_code:'Bantayan',condition_status:'maintenance',tilt_degree:0,notes:'Rusak Ringan',koarmada:'Koarmada I',kodaeral:'Kodaeral I (Belawan)',perbatasan:'Thailand & Malaysia',perairan:'Selat Malaka'},
+  {code:'182',td:'182',epoch:'2022.0',latitude:4.893889,longitude:97.913611,region:'Aceh',district:'Aceh Timur',location_desc:'Ug. Peureula',block_code:'Peureulak',condition_status:'maintenance',tilt_degree:0,notes:'Rusak Ringan',koarmada:'Koarmada I',kodaeral:'Kodaeral I (Belawan)',perbatasan:'Malaysia',perairan:'Selat Malaka'},
+  {code:'183',td:'183',epoch:'2022.0',latitude:4.426667,longitude:98.2875,region:'Aceh',district:'Aceh Tamiang',location_desc:'Ug. Tamiang',block_code:'Seuruway',condition_status:'relocate',tilt_degree:0,notes:'Hilang',koarmada:'Koarmada I',kodaeral:'Kodaeral I (Belawan)',perbatasan:'Malaysia',perairan:'Selat Malaka'},
+  {code:'184',td:'184',epoch:'2021.0',latitude:3.777222,longitude:99.500833,region:'Sumut',district:'Serdang Bedagai',location_desc:'P. Berhala',block_code:'Tanjungberingin',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral I (Belawan)',perbatasan:'Malaysia',perairan:'Selat Malaka'},
+  {code:'185',td:'185',epoch:'2021.0',latitude:2.869444,longitude:100.684722,region:'Riau',district:'Rokan Hilir',location_desc:'Pulau Batu mandi',block_code:'Pasir Limau Kapas',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral II (Padang)',perbatasan:'Malaysia',perairan:'Selat Malaka'},
+  {code:'186',td:'186',epoch:'2021.0',latitude:2.095,longitude:101.708333,region:'Riau',district:'Bengkalis',location_desc:'Tg. Punah, P. Rupat',block_code:'Rupat Utara',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral IV (Batam)',perbatasan:'Malaysia',perairan:'Selat Malaka'},
+  {code:'186A',td:'186A',epoch:'2021.0',latitude:1.524722,longitude:102.470278,region:'Riau',district:'Bengkalis',location_desc:'Tg. Parit, P. Bengkalis',block_code:'Bengkalis',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral IV (Batam)',perbatasan:'Malaysia',perairan:'Selat Malaka'},
+  {code:'187',td:'187',epoch:'2020.0',latitude:1.101111,longitude:102.969722,region:'Riau',district:'Kep. Meranti',location_desc:'Tg. Kedabu, P. Rangsang',block_code:'Rangsang Pesisir',condition_status:'repair',tilt_degree:0,notes:'Rusak',koarmada:'Koarmada I',kodaeral:'Kodaeral IV (Batam)',perbatasan:'Malaysia',perairan:'Selat Malaka'},
+  {code:'188',td:'188',epoch:'2021.0',latitude:1.191833,longitude:103.352278,region:'Kepri',district:'Karimun',location_desc:'P. Iyu Kecil',block_code:'Tebing',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral IV (Batam)',perbatasan:'Malaysia',perairan:'Selat Malaka'},
+  {code:'189',td:'189',epoch:'2021.0',latitude:1.166389,longitude:103.388889,region:'Kepri',district:'Karimun',location_desc:'P. Karimun Kecil',block_code:'Tebing',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral IV (Batam)',perbatasan:'Malaysia',perairan:'Selat Malaka'},
+  {code:'190',td:'190',epoch:'2021.0',latitude:1.153611,longitude:103.653056,region:'Kepri',district:'Kota Batam',location_desc:'P. Nipah',block_code:'Belakang Padang',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral IV (Batam)',perbatasan:'Singapura',perairan:'Selat Singapura'},
+  {code:'191',td:'191',epoch:'2021.0',latitude:1.128889,longitude:103.699444,region:'Kepri',district:'Kota Batam',location_desc:'P. Pelampung',block_code:'Belakang Padang',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral IV (Batam)',perbatasan:'Singapura',perairan:'Selat Singapura'},
+  {code:'191A',td:'191A',epoch:'2020.0',latitude:1.124444,longitude:103.775278,region:'Kepri',district:'Karimun',location_desc:'P. Lekop',block_code:'Karimun',condition_status:'relocate',tilt_degree:0,notes:'Hilang',koarmada:'Koarmada I',kodaeral:'Kodaeral IV (Batam)',perbatasan:'Singapura',perairan:'Selat Singapura'},
+  {code:'191B',td:'191B',epoch:'2020.0',latitude:1.157222,longitude:103.813889,region:'Kepri',district:'Kota Batam',location_desc:'P. Tokong',block_code:'Belakang Padang',condition_status:'relocate',tilt_degree:0,notes:'Hilang',koarmada:'Koarmada I',kodaeral:'Kodaeral IV (Batam)',perbatasan:'Singapura',perairan:'Selat Singapura'},
+  {code:'192',td:'192',epoch:'2021.0',latitude:1.185,longitude:103.8825,region:'Kepri',district:'Kota Batam',location_desc:'P. Batuberantai',block_code:'Sekupang',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral IV (Batam)',perbatasan:'Singapura',perairan:'Selat Singapura'},
+  {code:'193',td:'193',epoch:'2021.0',latitude:1.208056,longitude:104.079722,region:'Kepri',district:'Kota Batam',location_desc:'P. Putri',block_code:'Nongsa',condition_status:'normal',tilt_degree:0,notes:'',koarmada:'Koarmada I',kodaeral:'Kodaeral IV (Batam)',perbatasan:'Singapura, Malaysia',perairan:'Selat Singapura'},
+  {code:'194',td:'194',epoch:'2024.0',latitude:1.204778,longitude:104.3935,region:'Kepri',district:'Bintan',location_desc:'Tg. Sading',block_code:'Tik. Sebong',condition_status:'normal',tilt_degree:0,notes:'Baik',koarmada:'Koarmada I',kodaeral:'Kodaeral IV (Batam)',perbatasan:'Malaysia',perairan:'Selat Singapura'}
+];
+
+/* ============================================
+   TOAST NOTIFICATIONS
+   ============================================ */
+const Toast = (() => {
+  const container = document.getElementById('toastContainer');
+  const icons = {
+    success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>',
+    error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>',
+    warning: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>',
+    info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>'
+  };
+  const show = function(type, title, message, duration) {
+    type = type || 'info'; duration = duration || 4000;
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = 'toast ' + type;
+    toast.innerHTML = '<div class="toast-icon">' + (icons[type] || icons.info) + '</div><div class="toast-content"><div class="toast-title">' + title + '</div>' + (message ? '<div class="toast-message">' + message + '</div>' : '') + '</div><button class="toast-close" onclick="this.parentElement.remove()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><path d="M18 6L6 18M6 6l12 12"/></svg></button>';
+    container.appendChild(toast);
+    setTimeout(function() { toast.style.opacity = '0'; setTimeout(function() { toast.remove(); }, 300); }, duration);
+  };
+  return { show: show };
+})();
+
+/* ============================================
+   API CLIENT
+   ============================================ */
+const API = (() => {
+  const isDemo = function() { return localStorage.getItem(CONFIG.DEMO_MODE_KEY) === 'true' || !supabase; };
+
+  const DEMO_DATA = {
+    stats: { total: 156, normal: 80, need_action: 50, overdue: 26, with_cctv: 42 },
+    ptr: PTR_DATA_FULL.slice(0, 50),
+    cctv: PTR_DATA_FULL.filter(p => p.code === '001A' || p.code === '022' || p.code === '023' || p.code === '073' || p.code === '118').map(p => ({ code: 'PTR-' + p.code, cctv_id: 'CAM-' + p.code, condition_status: p.condition_status, region: p.region }))
+  };
+
+  return {
+    login: async function(email, password) {
+      if (isDemo()) return { token:'demo-token', user:{ id:'demo', username:'demo', fullName:'Demo User', role:'admin', region:'Jakarta' } };
+      var res = await supabase.auth.signInWithPassword({ email: email, password: password });
+      if (res.error) throw new Error(res.error.message);
+      var prof = await supabase.from('users').select('*').eq('id', res.data.user.id).single();
+      var user = { id:res.data.user.id, username:(prof.data && prof.data.username) || email.split('@')[0], fullName:(prof.data && prof.data.full_name) || email, role:(prof.data && prof.data.role) || 'viewer', region:(prof.data && prof.data.region) || 'Unknown' };
+      return { token:res.data.session.access_token, user:user };
+    },
+    getStats: async function(epoch) {
+      if (isDemo()) return DEMO_DATA.stats;
+      var res = await supabase.from('ptr').select('id,condition_status,last_inspection,has_cctv').eq('epoch', epoch || '2021.0');
+      if (res.error) throw new Error(res.error.message);
+      var d = res.data || [];
+      var total = d.length;
+      var normal = d.filter(function(p){ return p.condition_status === 'normal'; }).length;
+      return { total:total, normal:normal, need_action:total-normal, overdue:26, with_cctv:d.filter(function(p){ return p.has_cctv; }).length };
+    },
+    getPtrList: async function(filters) {
+      if (isDemo()) return { data:PTR_DATA_FULL, total:PTR_DATA_FULL.length };
+      var q = supabase.from('ptr').select('*').order('code', { ascending:true });
+      if (filters && filters.epoch) q = q.eq('epoch', filters.epoch);
+      var res = await q;
+      if (res.error) throw new Error(res.error.message);
+      return { data:res.data || [], total:(res.data || []).length };
+    },
+    getCctvList: async function() {
+      if (isDemo()) return { data:DEMO_DATA.cctv };
+      var res = await supabase.from('ptr').select('code,cctv_id,condition_status,region').eq('has_cctv', true).not('cctv_id','is',null).order('code');
+      if (res.error) throw new Error(res.error.message);
+      return { data:res.data || [] };
+    },
+    createPtr: async function(data) {
+      if (isDemo()) { Toast.show('success','Demo Mode','Data disimpan ke localStorage'); return { id:'demo-'+Date.now() }; }
+      var res = await supabase.from('ptr').insert([{ code:data.code, epoch:data.epoch, latitude:data.latitude, longitude:data.longitude, region:data.region, condition_status:data.condition_status || 'normal', tilt_degree:data.tilt_degree || 0, notes:data.notes }]).select().single();
+      if (res.error) throw new Error(res.error.message);
+      return res.data;
+    },
+    uploadPhotos: async function(ptrId, files) {
+      if (isDemo()) { Toast.show('info','Demo Mode', files.length + ' foto disimpan lokal'); return { photos:[] }; }
+      var uploaded = [];
+      for (var i = 0; i < files.length; i++) {
+        var file = files[i];
+        var ext = file.name.split('.').pop();
+        var fileName = ptrId + '/' + Date.now() + '-' + Math.random().toString(36).substring(7) + '.' + ext;
+        var up = await supabase.storage.from('ptr-photos').upload(fileName, file, { cacheControl:'3600', upsert:false });
+        if (up.error) continue;
+        var url = supabase.storage.from('ptr-photos').getPublicUrl(fileName).data.publicUrl;
+        uploaded.push({ file_name:file.name, public_url:url });
+      }
+      return { photos:uploaded };
+    },
+    logout: async function() {
+      if (!isDemo() && supabase) await supabase.auth.signOut();
+      localStorage.removeItem(CONFIG.TOKEN_KEY);
+      localStorage.removeItem(CONFIG.USER_KEY);
+      localStorage.removeItem('user-id');
+    }
+  };
+})();
+
+/* ============================================
+   AUTH MODULE
+   ============================================ */
+const Auth = (() => {
+  const loginScreen = document.getElementById('loginScreen');
+  const mainApp = document.getElementById('mainApp');
+  const loginForm = document.getElementById('loginForm');
+  const loginError = document.getElementById('loginError');
+  const loginBtn = document.getElementById('loginBtn');
+  const demoBtn = document.getElementById('demoBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+
+  const showApp = function(user) {
+    if (loginScreen) loginScreen.classList.add('hidden');
+    if (mainApp) mainApp.style.display = 'grid';
+    var nameEl = document.getElementById('userName');
+    var roleEl = document.getElementById('userRole');
+    var avatarEl = document.getElementById('userAvatar');
+    if (nameEl) nameEl.textContent = user.fullName || user.username;
+    if (roleEl) roleEl.textContent = (user.role || '') + ' · ' + (user.region || '—');
+    if (avatarEl) avatarEl.textContent = (user.fullName || user.username).substring(0,2).toUpperCase();
+    Dashboard.init();
+  };
+
+  const showLogin = function() {
+    if (loginScreen) loginScreen.classList.remove('hidden');
+    if (mainApp) mainApp.style.display = 'none';
+  };
+
+  const init = async function() {
+    if (!supabase) { showLogin(); return; }
+    try {
+      var session = await supabase.auth.getSession();
+      if (session.data && session.data.session) {
+        var prof = await supabase.from('users').select('*').eq('id', session.data.session.user.id).single();
+        var user = { id:session.data.session.user.id, username:(prof.data && prof.data.username) || session.data.session.user.email.split('@')[0], fullName:(prof.data && prof.data.full_name) || session.data.session.user.email, role:(prof.data && prof.data.role) || 'viewer', region:(prof.data && prof.data.region) || 'Unknown' };
+        localStorage.setItem(CONFIG.TOKEN_KEY, session.data.session.access_token);
+        localStorage.setItem(CONFIG.USER_KEY, JSON.stringify(user));
+        localStorage.setItem('user-id', user.id);
+        showApp(user);
+      } else { showLogin(); }
+    } catch (e) { showLogin(); }
+  };
+
+  if (loginForm) {
+    loginForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      if (loginError) loginError.classList.remove('show');
+      if (loginBtn) { loginBtn.disabled = true; loginBtn.textContent = 'Memproses...'; }
+      try {
+        var email = document.getElementById('loginUsername').value;
+        var password = document.getElementById('loginPassword').value;
+        var data = await API.login(email, password);
+        localStorage.setItem(CONFIG.TOKEN_KEY, data.token);
+        localStorage.setItem(CONFIG.USER_KEY, JSON.stringify(data.user));
+        localStorage.setItem('user-id', data.user.id);
+        localStorage.removeItem(CONFIG.DEMO_MODE_KEY);
+        Toast.show('success','Login berhasil','Selamat datang, ' + data.user.fullName);
+        showApp(data.user);
+      } catch (err) {
+        if (loginError) { loginError.textContent = err.message; loginError.classList.add('show'); }
+      } finally {
+        if (loginBtn) { loginBtn.disabled = false; loginBtn.textContent = 'Masuk'; }
+      }
+    });
+  }
+
+  if (demoBtn) {
+    demoBtn.addEventListener('click', function() {
+      localStorage.setItem(CONFIG.DEMO_MODE_KEY, 'true');
+      localStorage.setItem(CONFIG.TOKEN_KEY, 'demo-token');
+      var demoUser = { id:'demo', username:'demo', fullName:'Demo User', role:'admin', region:'Jakarta' };
+      localStorage.setItem(CONFIG.USER_KEY, JSON.stringify(demoUser));
+      Toast.show('info','Mode Demo','Data contoh akan ditampilkan');
+      showApp(demoUser);
+    });
+  }
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', async function() {
+      if (confirm('Yakin ingin keluar?')) { await API.logout(); showLogin(); Toast.show('info','Logout berhasil','Sesi Anda telah diakhiri'); }
+    });
+  }
+
+  return { init: init };
+})();
+
+/* ============================================
+   DASHBOARD MODULE
+   ============================================ */
+const Dashboard = (() => {
+  let currentEpoch = '2021.0';
+  let ptrData = [];
+  let cctvData = [];
+  let map = null;
+  let markers = {};
+
+  const init = async function() {
+    await Promise.all([ loadStats(), loadPtrData(), loadCctvData() ]);
+    initMap();
+    renderCctvGrid();
+  };
+
+  const loadStats = async function() {
+    try {
+      var stats = await API.getStats(currentEpoch);
+      var el = function(id) { return document.getElementById(id); };
+      if (el('statTotal')) el('statTotal').textContent = Number(stats.total).toLocaleString('id-ID');
+      if (el('statNormal')) el('statNormal').textContent = Number(stats.normal).toLocaleString('id-ID');
+      if (el('statAction')) el('statAction').textContent = Number(stats.need_action).toLocaleString('id-ID');
+      if (el('statOverdue')) el('statOverdue').textContent = Number(stats.overdue).toLocaleString('id-ID');
+      var pct = stats.total > 0 ? ((stats.normal/stats.total)*100).toFixed(1) : 0;
+      if (el('statNormalPct')) el('statNormalPct').textContent = pct + '% dari total PTR';
+      if (el('statTotalTrend')) el('statTotalTrend').textContent = '↑ 4.2%';
+    } catch (err) { Toast.show('error','Gagal memuat statistik', err.message); }
+  };
+
+  const loadPtrData = async function() {
+    try {
+      var result = await API.getPtrList({ epoch:currentEpoch });
+      ptrData = result.data || [];
+      var el = function(id) { return document.getElementById(id); };
+      if (el('ptrCountBadge')) el('ptrCountBadge').textContent = ptrData.length;
+      if (el('mapActiveCount')) el('mapActiveCount').textContent = ptrData.length;
+    } catch (err) { Toast.show('error','Gagal memuat data PTR', err.message); }
+  };
+
+  const loadCctvData = async function() {
+    try {
+      var result = await API.getCctvList();
+      cctvData = result.data || [];
+      var el = function(id) { return document.getElementById(id); };
+      if (el('mapCctvCount')) el('mapCctvCount').textContent = cctvData.length;
+    } catch (err) { Toast.show('error','Gagal memuat data CCTV', err.message); }
+  };
+
+  const initMap = function() {
+    if (map || typeof L === 'undefined') return;
+    var mapEl = document.getElementById('map');
+    if (!mapEl) return;
+    map = L.map('map', { center: [-2.5, 118], zoom: 5, minZoom: 3, maxZoom: 18, zoomControl: true });
+    
+    // Esri World Imagery (Gratis, kualitas tinggi mirip Airbus)
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: '© Esri | © OpenStreetMap',
+      maxZoom: 18
+    }).addTo(map);
+    
+    // Overlay labels
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
+      attribution: '© CARTO',
+      subdomains: 'abcd',
+      maxZoom: 19
+    }).addTo(map);
+
+    renderMarkers();
+
+    var filterEl = document.getElementById('filterKoarmada');
+    if (filterEl) {
+      filterEl.addEventListener('change', function(e) {
+        var selected = e.target.value;
+        Object.keys(markers).forEach(function(k) {
+          var m = markers[k];
+          if (!selected) map.addLayer(m.marker);
+          else {
+            var ptr = ptrData.find(function(p){ return p.code === m.code; });
+            if (ptr && ptr.koarmada === selected) map.addLayer(m.marker);
+            else map.removeLayer(m.marker);
+          }
+        });
+      });
+    }
+  };
+
+  const colorMap = { normal:'#15803d', maintenance:'#d97706', repair:'#b91c1c', relocate:'#7c2d12' };
+  const statusLabel = { normal:'Normal', maintenance:'Perlu Pemeliharaan', repair:'Perlu Perbaikan', relocate:'Perlu Relokasi' };
+
+  const renderMarkers = function() {
+    ptrData.forEach(function(ptr) {
+      var color = colorMap[ptr.condition_status] || '#15803d';
+      var iconHtml = '<div style="width:14px; height:14px; border-radius:50%; background:' + color + '; border:2.5px solid white; box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>';
+      var customIcon = L.divIcon({ html: iconHtml, className: 'custom-marker', iconSize: [14, 14], iconAnchor: [7, 7] });
+      var marker = L.marker([ptr.latitude, ptr.longitude], { icon: customIcon }).addTo(map);
+      
+      var popupContent = '<div class="ptr-popup"><div class="ptr-popup-head"><div><div class="ptr-popup-id">PTR-' + ptr.code + '</div><div class="ptr-popup-name">' + ptr.region + ' · ' + (ptr.block_code || ptr.location_desc || '') + '</div></div></div><div class="ptr-popup-grid"><div><div class="ptr-popup-item-label">Kondisi</div><div class="ptr-popup-item-value">' + (statusLabel[ptr.condition_status] || ptr.condition_status) + '</div></div><div><div class="ptr-popup-item-label">Kemiringan</div><div class="ptr-popup-item-value">' + (ptr.tilt_degree || 0) + '°</div></div><div><div class="ptr-popup-item-label">Latitude</div><div class="ptr-popup-item-value mono">' + ptr.latitude + '°</div></div><div><div class="ptr-popup-item-label">Longitude</div><div class="ptr-popup-item-value mono">' + ptr.longitude + '°</div></div></div><div class="ptr-popup-koarmada"><div class="ptr-popup-koarmada-title">🏛️ Komando Wilayah</div><div class="ptr-popup-koarmada-grid"><div><div class="ptr-popup-item-label">KOARMADA</div><div class="ptr-popup-koarmada-item">' + (ptr.koarmada || '-') + '</div></div><div><div class="ptr-popup-item-label">KODAERAL</div><div class="ptr-popup-koarmada-item">' + (ptr.kodaeral || '-') + '</div></div></div><div style="margin-top:6px;"><div class="ptr-popup-item-label">PERAIRAN</div><div style="font-size:11px; font-weight:500;">' + (ptr.perairan || '-') + '</div></div><div style="margin-top:4px;"><div class="ptr-popup-item-label">PERBATASAN</div><div style="font-size:11px; font-weight:500;">' + (ptr.perbatasan || '-') + '</div></div></div></div>';
+      
+      marker.bindPopup(popupContent, { maxWidth: 320 });
+      marker.on('click', function() {
+        document.querySelectorAll('.cctv-tile').forEach(function(t) { t.classList.remove('selected','dimmed'); });
+        var sel = document.getElementById('cctvSelection');
+        if (sel) { sel.style.display = 'inline-block'; sel.textContent = 'Fokus: PTR-' + ptr.code; }
+      });
+      markers[ptr.code] = { marker:marker, code:ptr.code, color:color };
+    });
+  };
+
+  const renderCctvGrid = function() {
+    var grid = document.getElementById('cctvGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    cctvData.forEach(function(cctv) {
+      var tile = document.createElement('div');
+      tile.className = 'cctv-tile';
+      tile.dataset.ptr = cctv.code;
+      tile.innerHTML = '<div class="feed"><svg style="width:32px; height:32px; opacity:0.3;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></div><div class="cctv-label"><span class="rec"></span>' + cctv.code + ' · LIVE</div><div class="cctv-selected-badge">TERPILIH</div><div class="cctv-time" data-clock>--:--:--</div>';
+      tile.addEventListener('click', function() {
+        var ptr = ptrData.find(function(p){ return 'PTR-' + p.code === cctv.code; });
+        if (ptr && markers[ptr.code] && map) { map.setView([ptr.latitude, ptr.longitude], 10); markers[ptr.code].marker.openPopup(); }
+      });
+      grid.appendChild(tile);
+    });
+    var updateClock = function() {
+      var t = new Date().toTimeString().split(' ')[0];
+      document.querySelectorAll('[data-clock]').forEach(function(c) { c.textContent = t; });
+    };
+    updateClock();
+    setInterval(updateClock, 1000);
+  };
+
+  var epochEl = document.getElementById('epochSwitch');
+  if (epochEl) {
+    epochEl.addEventListener('click', async function(e) {
+      if (e.target.tagName === 'BUTTON') {
+        document.querySelectorAll('#epochSwitch button').forEach(function(b) { b.classList.remove('active'); });
+        e.target.classList.add('active');
+        currentEpoch = e.target.dataset.epoch;
+        await loadStats();
+        await loadPtrData();
+        if (map) {
+          Object.keys(markers).forEach(function(k) { map.removeLayer(markers[k].marker); });
+          markers = {};
+          renderMarkers();
+        }
+      }
+    });
+  }
+
+  return { init: init, getPtrData: function(){ return ptrData; }, getCctvData: function(){ return cctvData; }, getCurrentEpoch: function(){ return currentEpoch; } };
+})();
+
+/* ============================================
+   INVENTORY FORM
+   ============================================ */
+const Inventory = (() => {
+  const form = document.getElementById('inventoryForm');
+  const btnGps = document.getElementById('btnGps');
+  const photoDrop = document.getElementById('photoDrop');
+  const photoInput = document.getElementById('photoInput');
+  const inspectionType = document.getElementById('inspectionType');
+  let selectedPhotos = [];
+  let inspectionTypeValue = 'rutin';
+
+  if (btnGps) {
+    btnGps.addEventListener('click', function() {
+      if (btnGps.classList.contains('loading')) return;
+      btnGps.classList.add('loading');
+      btnGps.innerHTML = '<span style="display:inline-block; animation:spin 1s linear infinite;">⟳</span> Mengambil GPS...';
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          function(pos) {
+            var lat = pos.coords.latitude.toFixed(6);
+            var lng = pos.coords.longitude.toFixed(6);
+            var latEl = document.getElementById('lat');
+            var lngEl = document.getElementById('lng');
+            if (latEl) latEl.textContent = lat + '°';
+            if (lngEl) lngEl.textContent = lng + '°';
+            btnGps.classList.remove('loading');
+            btnGps.innerHTML = '<svg style="width:14px; height:14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg> GPS Aktif · Refresh';
+            Toast.show('success','GPS aktif','Lokasi: ' + lat + ', ' + lng);
+          },
+          function() {
+            var lat = (-6.2+(Math.random()-0.5)*0.1).toFixed(6);
+            var lng = (106.8+(Math.random()-0.5)*0.1).toFixed(6);
+            var latEl = document.getElementById('lat');
+            var lngEl = document.getElementById('lng');
+            if (latEl) latEl.textContent = lat + '°';
+            if (lngEl) lngEl.textContent = lng + '°';
+            btnGps.classList.remove('loading');
+            btnGps.innerHTML = 'Mulai GPS (Demo)';
+            Toast.show('warning','GPS tidak tersedia','Menggunakan lokasi simulasi');
+          },
+          { enableHighAccuracy:true, timeout:10000 }
+        );
+      }
+    });
+  }
+
+  if (photoDrop) {
+    photoDrop.addEventListener('click', function() { if (photoInput) photoInput.click(); });
+    if (photoInput) photoInput.addEventListener('change', function(e) { handleFiles(e.target.files); });
+    ['dragenter','dragover'].forEach(function(evt) { photoDrop.addEventListener(evt, function(e) { e.preventDefault(); photoDrop.classList.add('dragover'); }); });
+    ['dragleave','drop'].forEach(function(evt) { photoDrop.addEventListener(evt, function(e) { e.preventDefault(); photoDrop.classList.remove('dragover'); }); });
+    photoDrop.addEventListener('drop', function(e) { handleFiles(e.dataTransfer.files); });
+  }
+
+  const handleFiles = function(files) {
+    var newFiles = Array.from(files).slice(0, 3-selectedPhotos.length);
+    selectedPhotos = selectedPhotos.concat(newFiles).slice(0,3);
+    if (selectedPhotos.length > 0 && photoDrop) {
+      photoDrop.innerHTML = '<strong>' + selectedPhotos.length + ' foto terpilih</strong><span>' + selectedPhotos.map(function(f){ return f.name; }).join(', ') + '</span><input type="file" id="photoInput" accept="image/*" multiple style="display:none;" />';
+      document.getElementById('photoInput').addEventListener('change', function(e) { handleFiles(e.target.files); });
+    }
+  };
+
+  if (inspectionType) {
+    inspectionType.addEventListener('click', function(e) {
+      if (e.target.classList.contains('chip')) {
+        inspectionType.querySelectorAll('.chip').forEach(function(c) { c.classList.remove('active'); });
+        e.target.classList.add('active');
+        inspectionTypeValue = e.target.dataset.value;
+      }
+    });
+  }
+
+  if (form) {
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var submitBtn = document.getElementById('btnSubmit');
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<span style="display:inline-block; animation:spin 1s linear infinite;">⟳</span> Menyimpan...'; }
+      try {
+        var formData = new FormData(form);
+        var data = {
+          code: formData.get('code'),
+          epoch: Dashboard.getCurrentEpoch(),
+          latitude: parseFloat(document.getElementById('lat').textContent),
+          longitude: parseFloat(document.getElementById('lng').textContent),
+          region: formData.get('region'),
+          condition_status: formData.get('condition_status'),
+          tilt_degree: parseFloat(formData.get('tilt_degree')) || 0,
+          inspection_type: inspectionTypeValue,
+          notes: formData.get('notes')
+        };
+        var result = await API.createPtr(data);
+        if (selectedPhotos.length > 0 && result.id) await API.uploadPhotos(result.id, selectedPhotos);
+        Toast.show('success','Data berhasil disimpan','PTR ' + data.code + ' telah dicatat');
+        form.reset();
+        selectedPhotos = [];
+        if (photoDrop) {
+          photoDrop.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><strong>Drop foto timestamp di sini</strong><span>JPG, PNG · atau klik untuk memilih</span><input type="file" id="photoInput" accept="image/*" multiple style="display:none;" />';
+          document.getElementById('photoInput').addEventListener('change', function(e) { handleFiles(e.target.files); });
+        }
+        Dashboard.init();
+      } catch (err) { Toast.show('error','Gagal menyimpan', err.message); }
+      finally {
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg> Simpan ke Server'; }
+      }
+    });
+  }
+
+  var draftBtn = document.getElementById('btnSaveDraft');
+  if (draftBtn) {
+    draftBtn.addEventListener('click', function() {
+      var formData = new FormData(form);
+      var drafts = JSON.parse(localStorage.getItem('simptr-drafts') || '[]');
+      drafts.push({ code:formData.get('code'), region:formData.get('region'), condition_status:formData.get('condition_status'), saved_at:new Date().toISOString() });
+      localStorage.setItem('simptr-drafts', JSON.stringify(drafts));
+      var draftStatus = document.getElementById('draftStatus');
+      if (draftStatus) draftStatus.textContent = 'Draft · ' + drafts.length + ' item';
+      Toast.show('info','Draft tersimpan','Data disimpan di browser');
+    });
+  }
+
+  var style = document.createElement('style');
+  style.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
+  document.head.appendChild(style);
+})();
+
+/* ============================================
+   THEME TOGGLE
+   ============================================ */
+const Theme = (() => {
+  const root = document.documentElement;
+  const btn = document.getElementById('themeToggle');
+  const saved = localStorage.getItem('simptr-theme');
+  if (saved) root.setAttribute('data-theme', saved);
+  if (btn) {
+    btn.addEventListener('click', function() {
+      var current = root.getAttribute('data-theme');
+      var next = current === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      localStorage.setItem('simptr-theme', next);
+    });
+  }
+})();
+
+/* ============================================
+   NAVIGATION
+   ============================================ */
+const Navigation = (() => {
+  const items = document.querySelectorAll('.nav-item');
+  items.forEach(function(item) {
+    item.addEventListener('click', function(e) {
+      e.preventDefault();
+      items.forEach(function(i) { i.classList.remove('active'); });
+      item.classList.add('active');
+      var bc = document.getElementById('breadcrumbCurrent');
+      if (bc) bc.textContent = item.textContent.trim();
+    });
+  });
+})();
+
+/* ============================================
+   OFFLINE DETECTION
+   ============================================ */
+const Offline = (() => {
+  const banner = document.getElementById('offlineBanner');
+  const update = function() { if (banner) { if (!navigator.onLine) banner.classList.add('show'); else banner.classList.remove('show'); } };
+  window.addEventListener('online', function() { update(); Toast.show('success','Koneksi kembali','Data akan disinkronkan'); Dashboard.init(); });
+  window.addEventListener('offline', update);
+  update();
+})();
+
+/* ============================================
+   INIT
+   ============================================ */
+document.addEventListener('DOMContentLoaded', function() {
+  Auth.init();
+  console.log('%c SIM-PTR BNPP ', 'background:#0f766e; color:white; padding:4px 8px; border-radius:4px; font-weight:bold;', 'v2.5 · Self-contained');
+});
+</script>
+</body>
+</html>
