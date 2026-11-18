@@ -389,14 +389,20 @@ var SUPABASE_ANON_KEY='sb_publishable_aRr8RyYmV2vhE83JC5HzYg_4uaUoxkc';
 var CONFIG={TOKEN_KEY:'simptr-token',USER_KEY:'simptr-user',DEMO_MODE_KEY:'simptr-demo'};
 var supabaseClient=null,currentUser=null;
 
-/* ============ VALIDASI URL SUPABASE ============ */
+/* ============ FIX: PAKSA CLEAR URL LAMA ============ */
 (function(){
-  var stored=localStorage.getItem('simptr-url-check');
-  if(stored!==SUPABASE_URL){
-    localStorage.clear();
-    localStorage.setItem('simptr-url-check',SUPABASE_URL);
-    console.log('%c SIM-PTR ','background:#00ff9d;color:#000;padding:4px 8px;font-weight:bold','Cache lama dibersihkan, URL Supabase divalidasi');
+  // Hapus SEMUA key localStorage yang berhubungan dengan URL lama
+  var keys = Object.keys(localStorage);
+  for(var i=0; i<keys.length; i++){
+    var k = keys[i];
+    // Hapus semua key yang mengandung 'url' atau 'supabase' atau 'token'
+    if(k.indexOf('url')>=0 || k.indexOf('supabase')>=0 || k.indexOf('token')>=0 || k.indexOf('simptr')>=0){
+      localStorage.removeItem(k);
+    }
   }
+  // Set flag bahwa URL sudah divalidasi
+  localStorage.setItem('simptr-url-ok', SUPABASE_URL);
+  console.log('%c SIM-PTR ','background:#00ff9d;color:#000;padding:4px 8px;font-weight:bold','Cache URL lama dibersihkan');
 })();
 
 try{
