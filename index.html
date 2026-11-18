@@ -614,8 +614,14 @@ function loadPtrData(){return API.getPtrList().then(function(r){ptrData=r.data||
 function loadCctvData(){return API.getCctvList().then(function(r){cctvData=r.data||[];document.getElementById('mapCctvCount').textContent=cctvData.length})}
 
 function initMap(){if(map)return;map=L.map('map',{center:[-2.5,118],zoom:5,minZoom:3,maxZoom:18});
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© CARTO © OSM',maxZoom:19}).addTo(map);
-labelLayer=L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19}).addTo(map);
+// Base: Esri World Imagery (Satelit)
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{
+  attribution:'© Esri',maxZoom:19
+}).addTo(map);
+// Overlay: Esri Reference Labels (nama tempat)
+labelLayer=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',{
+  attribution:'© Esri',maxZoom:19
+}).addTo(map);
 renderMarkers();renderCamChips();
 document.getElementById('filterKoarmada').addEventListener('change',function(e){var sel=e.target.value;Object.keys(markers).forEach(function(k){var m=markers[k];var ptr=ptrData.find(function(p){return p.code===m.code});if(!sel||(ptr&&ptr.koarmada===sel)){map.addLayer(m.marker);if(m.cam)map.addLayer(m.cam)}else{map.removeLayer(m.marker);if(m.cam)map.removeLayer(m.cam)}})});
 document.getElementById('globalSearch').addEventListener('input',function(e){var q=e.target.value.toLowerCase();if(!q)return;var hit=ptrData.find(function(p){return p.code.toLowerCase().indexOf(q)>=0||(p.region||'').toLowerCase().indexOf(q)>=0||(p.location_desc||'').toLowerCase().indexOf(q)>=0});if(hit&&markers[hit.code]){map.setView([hit.latitude,hit.longitude],8);openTac(hit)}})}
