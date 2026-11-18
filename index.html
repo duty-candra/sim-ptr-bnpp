@@ -602,9 +602,28 @@ getPtrList:function(){if(isDemo())return Promise.resolve({data:PTR_DATA_FULL,tot
 getCctvList:function(){if(isDemo())return Promise.resolve({data:PTR_DATA_FULL.filter(function(p){return CCTV_CODES.indexOf(p.code)>=0})});return supabaseClient.from('ptr').select('*').eq('has_cctv',true).order('code').then(function(r){if(r.error)throw new Error(r.error.message);return{data:r.data||[]}})},
 createPtr:function(data){if(!canEdit())return Promise.reject(new Error('Role Anda tidak memiliki hak input data.'));if(isDemo()){Toast.show('success','DEMO','Data disimpan lokal');return Promise.resolve({id:'demo-'+Date.now()})}return supabaseClient.from('ptr').insert([{code:data.code,epoch:'2021.0',latitude:data.latitude,longitude:data.longitude,region:data.region,district:data.district,block_code:data.block_code,location_desc:data.location_desc,condition_status:data.condition_status||'normal',tilt_degree:data.tilt_degree||0,notes:data.notes}]).select().single().then(function(r){if(r.error)throw new Error(r.error.message);return r.data})},
 uploadPhotos:function(id,files){if(isDemo())return Promise.resolve({photos:[]});var up=[],ps=[];for(var i=0;i<files.length;i++){(function(f){var n=id+'/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.'+f.name.split('.').pop();ps.push(supabaseClient.storage.from('ptr-photos').upload(n,f,{upsert:false}).then(function(r){if(!r.error)up.push({file_name:f.name,public_url:supabaseClient.storage.from('ptr-photos').getPublicUrl(n).data.publicUrl})}))})(files[i])}return Promise.all(ps).then(function(){return{photos:up}})},
-listUsers:function(){if(isDemo())return Promise.resolve([{id:'1',full_name:'Operator BNPP',username:'operator',role:'owner',region:'Jakarta',email:'operator@bnpp.go.id'},{id:'2',full_name:'Admin Pusat',username:'adminpusat',role:'admin',region:'Jakarta',email:'admin@bnpp.go.id'},{id:'3',full_name:'Petugas Lapangan Kepri',username:'petugas1',role:'user',region:'Kepri',email:'petugas1@bnpp.go.id'}]);return supabaseClient.from('users').select('*').order('created_at').then(function(r){if(r.error)throw new Error(r.error.message);return r.data||[]})},
-setRole:function(id,newRole){if(isDemo()){Toast.show('success','DEMO','Role diubah');return Promise.resolve()}return supabaseClient.from('users').update({role:newRole}).eq('id',id).then(function(r){if(r.error)throw new Error(r.error.message)})},
-logout:function(){if(!isDemo()&&supabaseClient)return supabaseClient.auth.signOut();return Promise.resolve()}}})();
+listUsers:function(){
+  // Mode Demo: return data dummy
+  if(isDemo()) return Promise.resolve([
+    {id:'1',full_name:'Operator BNPP',username:'operator',role:'owner',region:'Jakarta',email:'operator@bnpp.go.id'},
+    {id:'2',full_name:'Admin Pusat',username:'adminpusat',role:'admin',region:'Jakarta',email:'admin@bnpp.go.id'},
+    {id:'3',full_name:'Petugas Lapangan Kepri',username:'petugas1',role:'user',region:'Kepri',email:'petugas1@bnpp.go.id'}
+  ]);
+  
+  // Real: query dari Supabase dengan error handling
+  return supabaseClient.from('users').select('*').order('created_at').then(function(r){
+    if(r.error){
+      console.error('listUsers error:', r.error);
+      throw new Error(r.error.message || 'Gagal memuat user');
+    }
+    return r.data || [];
+  }).catch(function(err){
+    console.error('listUsers catch:', err);
+    // Fallback: return empty array agar tidak crash
+    Toast.show('warning','USER TIDAK BISA DIMUAT', err.message);
+    return [];
+  });
+},
 
 /* ============ AUTH ============ */
 var Auth=(function(){var ls=document.getElementById('loginScreen'),ma=document.getElementById('mainApp'),lf=document.getElementById('loginForm'),le=document.getElementById('loginError'),lb=document.getElementById('loginBtn');
@@ -677,19 +696,80 @@ document.querySelectorAll('.switch').forEach(function(sw){sw.addEventListener('c
 
 return{init:init,getPtrData:function(){return ptrData},openTac:openTac}})();
 
-/* ============ KELOLA USER ============ */
-var Users=(function(){var modal=document.getElementById('usersModal');
-function open(){API.listUsers().then(function(list){var tb=document.getElementById('usersTbody');if(!tb)return;tb.innerHTML='';list.forEach(function(u){var canEditThis=(isOwner()&&u.role!=='owner')||(role()==='admin'&&u.role==='user');var tr=document.createElement('tr');
-tr.innerHTML='<td>'+(u.full_name||u.username)+'</td><td>'+(u.email||'—')+'</td>'+
-'<td><select class="select" style="padding:4px 8px;font-size:11px" '+(canEditThis?'':'disabled')+'>'+['user','admin','owner'].map(function(r){return'<option value="'+r+'"'+(u.role===r?' selected':'')+'>'+r.toUpperCase()+'</option>'}).join('')+'</select></td>'+
-'<td><span class="badge-st st-normal">AKTIF</span></td>'+
-'<td>'+(canEditThis?'<button class="btn btn-ghost" style="padding:4px 10px;font-size:10px" data-id="'+u.id+'">Simpan</button>':'<span style="color:var(--text-subtle);font-size:10px">🔒</span>')+'</td>';
-tb.appendChild(tr)});
-tb.querySelectorAll('select').forEach(function(sel){sel.addEventListener('change',function(){var id=sel.closest('tr').querySelector('[data-id]').dataset.id;API.setRole(id,sel.value).then(function(){Toast.show('success','ROLE DIUBAH','Role disimpan ke database')}).catch(function(e){Toast.show('error','GAGAL',e.message)})})});
-if(modal)modal.classList.add('show')})}
-var cu=document.getElementById('closeUsers');if(cu)cu.addEventListener('click',function(){if(modal)modal.classList.remove('show')});
-var nu=document.getElementById('navUsers');if(nu)nu.addEventListener('click',function(e){e.preventDefault();open()});
-return{open:open}})();
+/* ============ KELOLA USER (FIXED) ============ */
+var Users=(function(){
+  var modal=document.getElementById('usersModal');
+  
+  function open(){
+    // Cek permission dulu
+    if(!canManageUsers()){
+      Toast.show('error','AKSES DITOLAK','Hanya Owner/Admin yang bisa mengelola user');
+      return;
+    }
+    
+    API.listUsers().then(function(list){
+      var tb=document.getElementById('usersTbody');
+      if(!tb) return;
+      tb.innerHTML='';
+      
+      if(!list || list.length===0){
+        tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--text-subtle);padding:20px">Tidak ada data user</td></tr>';
+      } else {
+        list.forEach(function(u){
+          var canEditThis=(isOwner()&&u.role!=='owner')||(role()==='admin'&&u.role==='user');
+          var tr=document.createElement('tr');
+          tr.innerHTML=
+            '<td>'+(u.full_name||u.username||'—')+'</td>'+
+            '<td>'+(u.email||'—')+'</td>'+
+            '<td><select class="select" style="padding:4px 8px;font-size:11px" '+(canEditThis?'':'disabled')+'>'+
+              ['user','admin','owner'].map(function(r){
+                return '<option value="'+r+'"'+(u.role===r?' selected':'')+'>'+r.toUpperCase()+'</option>';
+              }).join('')+
+            '</select></td>'+
+            '<td><span class="badge-st st-normal">AKTIF</span></td>'+
+            '<td>'+(canEditThis
+              ?'<button class="btn btn-ghost" style="padding:4px 10px;font-size:10px" data-id="'+u.id+'">Simpan</button>'
+              :'<span style="color:var(--text-subtle);font-size:10px">🔒</span>')+
+            '</td>';
+          tb.appendChild(tr);
+        });
+        
+        // Bind event untuk tombol Simpan
+        tb.querySelectorAll('button[data-id]').forEach(function(btn){
+          btn.addEventListener('click', function(){
+            var id = btn.dataset.id;
+            var select = btn.closest('tr').querySelector('select');
+            var newRole = select.value;
+            API.setRole(id, newRole).then(function(){
+              Toast.show('success','ROLE DIUBAH','Role '+newRole.toUpperCase()+' disimpan');
+            }).catch(function(e){
+              Toast.show('error','GAGAL', e.message);
+            });
+          });
+        });
+      }
+      
+      if(modal) modal.classList.add('show');
+    }).catch(function(err){
+      Toast.show('error','GAGAL MEMUAT USER', err.message);
+    });
+  }
+  
+  var cu=document.getElementById('closeUsers');
+  if(cu) cu.addEventListener('click', function(){ if(modal) modal.classList.remove('show'); });
+  
+  var nu=document.getElementById('navUsers');
+  if(nu) nu.addEventListener('click', function(e){ e.preventDefault(); open(); });
+  
+  // Tutup modal jika klik di luar
+  if(modal){
+    modal.addEventListener('click', function(e){
+      if(e.target===modal) modal.classList.remove('show');
+    });
+  }
+  
+  return {open:open};
+})();
 
 /* ============ INVENTARISASI ============ */
 var Inventory=(function(){var form=document.getElementById('inventoryForm'),btnGps=document.getElementById('btnGps'),photoDrop=document.getElementById('photoDrop'),photoInput=document.getElementById('photoInput'),inspectionType=document.getElementById('inspectionType'),selectedPhotos=[],inspectionTypeValue='rutin';
