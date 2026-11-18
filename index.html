@@ -22,7 +22,7 @@
 html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;line-height:1.55;color:var(--text);background:var(--bg)}
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
 input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
-a{color:inherit;text-decoration:none}
+a{color:inherit;text-decoration:none;cursor:pointer}
 .app{display:grid;grid-template-columns:var(--sidebar-w) 1fr;min-height:100vh}
 .sidebar{background:var(--bg-elev);border-right:1px solid var(--border);padding:18px 12px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:30}
 .brand{display:flex;align-items:center;gap:10px;padding:6px 8px 16px;border-bottom:1px solid var(--border);margin-bottom:10px}
@@ -58,7 +58,7 @@ a{color:inherit;text-decoration:none}
 .page-header h1{font-size:19px;font-weight:800;color:var(--text)}
 .page-header h1 em{font-style:normal;color:var(--primary);text-shadow:var(--glow)}
 .page-header p{color:var(--text-muted);font-size:12.5px;font-family:var(--mono)}
-.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:var(--radius-sm);font-size:12.5px;font-weight:700;transition:all var(--transition);border:1px solid transparent;font-family:var(--mono);letter-spacing:.03em;text-transform:uppercase}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:var(--radius-sm);font-size:12.5px;font-weight:700;transition:all var(--transition);border:1px solid transparent;font-family:var(--mono);letter-spacing:.03em;text-transform:uppercase;cursor:pointer}
 .btn svg{width:14px;height:14px}
 .btn-primary{background:var(--primary);color:#00150c;box-shadow:var(--glow)}
 .btn-primary:hover{background:var(--primary-hover)}
@@ -76,7 +76,7 @@ a{color:inherit;text-decoration:none}
 .login-field label{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono)}
 .login-field input{background:var(--bg-soft);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;font-size:13px;outline:none;font-family:var(--mono);width:100%}
 .login-field input:focus{border-color:var(--primary);box-shadow:var(--glow)}
-.login-btn{width:100%;background:var(--primary);color:#00150c;padding:11px;border-radius:var(--radius-sm);font-size:12px;font-weight:800;margin-top:6px;letter-spacing:.1em;text-transform:uppercase;font-family:var(--mono)}
+.login-btn{width:100%;background:var(--primary);color:#00150c;padding:11px;border-radius:var(--radius-sm);font-size:12px;font-weight:800;margin-top:6px;letter-spacing:.1em;text-transform:uppercase;font-family:var(--mono);cursor:pointer}
 .login-error{background:var(--danger-soft);color:var(--danger);border:1px solid rgba(255,77,77,.3);padding:9px 12px;border-radius:var(--radius-sm);font-size:11.5px;margin-bottom:12px;display:none;font-family:var(--mono)}
 .login-error.show{display:block}
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
@@ -116,7 +116,7 @@ a{color:inherit;text-decoration:none}
 .cam-chip .cam-id{padding:5px 7px;font-size:9px;font-family:var(--mono);color:var(--primary);display:flex;justify-content:space-between;border-top:1px solid rgba(0,255,157,.2)}
 .cam-chip .cam-id .sig{color:var(--accent)}
 .tac-rail{position:absolute;top:12px;right:12px;display:flex;flex-direction:column;gap:7px;z-index:900}
-.tac-rail button{width:38px;height:38px;border-radius:10px;background:rgba(5,10,8,.85);border:1px solid var(--border-strong);color:var(--primary);display:grid;place-items:center;backdrop-filter:blur(6px)}
+.tac-rail button{width:38px;height:38px;border-radius:10px;background:rgba(5,10,8,.85);border:1px solid var(--border-strong);color:var(--primary);display:grid;place-items:center;backdrop-filter:blur(6px);cursor:pointer}
 .tac-rail button:hover,.tac-rail button.on{border-color:var(--primary);box-shadow:var(--glow);background:rgba(0,255,157,.12)}
 .tac-rail svg{width:17px;height:17px}
 .layer-panel{position:absolute;top:12px;right:58px;width:220px;background:rgba(5,10,8,.92);border:1px solid var(--border-strong);border-radius:var(--radius-md);padding:14px;z-index:900;display:none;backdrop-filter:blur(8px)}
@@ -147,7 +147,7 @@ a{color:inherit;text-decoration:none}
 .tac-loc{display:flex;align-items:center;gap:9px;margin-bottom:8px}
 .tac-loc strong{font-size:14px;font-family:var(--mono);display:block}
 .tac-loc span{font-size:10px;color:var(--text-muted);font-family:var(--mono)}
-.tac-loc .xclose{margin-left:auto;width:26px;height:26px;border-radius:6px;border:1px solid var(--border-strong);color:var(--danger);display:grid;place-items:center}
+.tac-loc .xclose{margin-left:auto;width:26px;height:26px;border-radius:6px;border:1px solid var(--border-strong);color:var(--danger);display:grid;place-items:center;cursor:pointer}
 .feed{position:relative;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:linear-gradient(180deg,#0d1f18,#040807);border:1px solid var(--border-strong)}
 .feed .sky{position:absolute;top:0;left:0;right:0;height:34%;background:linear-gradient(180deg,#12303f,#0a1a22)}
 .feed .road{position:absolute;bottom:0;left:0;right:0;height:66%;background:linear-gradient(180deg,#1a2620,#0d1410);clip-path:polygon(38% 0,62% 0,100% 100%,0 100%)}
@@ -166,7 +166,7 @@ a{color:inherit;text-decoration:none}
 .feed .aibox.b1{width:46px;height:26px;bottom:14%;left:24%;animation:car1 6s linear infinite}
 .feed .aibox.b2{width:56px;height:30px;bottom:30%;left:54%;animation:car2 8s linear infinite}
 .tac-actions{display:flex;gap:8px;margin-top:10px}
-.tac-btn{flex:1;padding:8px;border-radius:6px;border:1px solid var(--border-strong);background:var(--bg-soft);color:var(--text);font-size:10px;font-weight:700;font-family:var(--mono);display:flex;align-items:center;justify-content:center;gap:5px}
+.tac-btn{flex:1;padding:8px;border-radius:6px;border:1px solid var(--border-strong);background:var(--bg-soft);color:var(--text);font-size:10px;font-weight:700;font-family:var(--mono);display:flex;align-items:center;justify-content:center;gap:5px;cursor:pointer}
 .tac-btn:hover{border-color:var(--primary);color:var(--primary)}
 .tac-btn.active{background:var(--primary-soft);border-color:var(--primary);color:var(--primary)}
 .nocam{padding:14px;text-align:center;border:1px dashed var(--border-strong);border-radius:8px;font-family:var(--mono);font-size:11px;color:var(--text-subtle)}
@@ -185,9 +185,9 @@ a{color:inherit;text-decoration:none}
 .gps-box{background:var(--bg-soft);border:1px dashed var(--border-strong);border-radius:var(--radius-md);padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .gps-box .coord-label{font-size:9px;text-transform:uppercase;color:var(--text-subtle);font-weight:700;font-family:var(--mono)}
 .gps-box .coord-value{font-family:var(--mono);font-size:12.5px;color:var(--primary)}
-.btn-gps{grid-column:1/-1;background:var(--primary);color:#00150c;padding:9px;border-radius:var(--radius-sm);font-size:11px;font-weight:800;font-family:var(--mono);letter-spacing:.06em}
+.btn-gps{grid-column:1/-1;background:var(--primary);color:#00150c;padding:9px;border-radius:var(--radius-sm);font-size:11px;font-weight:800;font-family:var(--mono);letter-spacing:.06em;cursor:pointer}
 .chip-group{display:flex;flex-wrap:wrap;gap:6px}
-.chip{padding:5px 11px;border-radius:20px;background:var(--bg-soft);border:1px solid var(--border);font-size:11px;font-weight:600;color:var(--text-muted);font-family:var(--mono)}
+.chip{padding:5px 11px;border-radius:20px;background:var(--bg-soft);border:1px solid var(--border);font-size:11px;font-weight:600;color:var(--text-muted);font-family:var(--mono);cursor:pointer}
 .chip.active{background:var(--primary-soft);border-color:var(--primary);color:var(--primary)}
 .photo-drop{border:1.5px dashed var(--border-strong);border-radius:var(--radius-md);padding:18px;text-align:center;cursor:pointer}
 .photo-drop:hover,.photo-drop.dragover{border-color:var(--primary);background:var(--primary-soft)}
@@ -214,10 +214,6 @@ table.utab{width:100%;border-collapse:collapse;font-family:var(--mono);font-size
 table.utab th{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border-strong);color:var(--text-subtle);font-size:9.5px;text-transform:uppercase;letter-spacing:.08em}
 table.utab td{padding:8px 10px;border-bottom:1px dashed var(--border)}
 table.utab tr:hover td{background:var(--bg-soft)}
-.role-tag{padding:2px 8px;border-radius:10px;font-size:9.5px;font-weight:800}
-.role-owner{background:rgba(255,176,32,.15);color:var(--accent)}
-.role-admin{background:var(--primary-soft);color:var(--primary)}
-.role-user{background:rgba(255,255,255,.06);color:var(--text-muted)}
 .toast-container{position:fixed;top:16px;right:16px;z-index:200;display:flex;flex-direction:column;gap:8px}
 .toast{background:var(--bg-elev);border:1px solid var(--border);border-left:4px solid var(--primary);border-radius:var(--radius-md);padding:11px 14px;box-shadow:var(--shadow-lg);min-width:260px;max-width:380px;display:flex;gap:9px;animation:slideIn .3s}
 .toast.error{border-left-color:var(--danger)}.toast.warning{border-left-color:var(--accent)}
@@ -392,10 +388,27 @@ var SUPABASE_URL='https://iodosyuugwdvsqrqvpze.supabase.co';
 var SUPABASE_ANON_KEY='sb_publishable_aRr8RyYmV2vhE83JC5HzYg_4uaUoxkc';
 var CONFIG={TOKEN_KEY:'simptr-token',USER_KEY:'simptr-user',DEMO_MODE_KEY:'simptr-demo'};
 var supabaseClient=null,currentUser=null;
-try{if(window.supabase&&SUPABASE_URL.includes('supabase.co')){supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY)}}catch(e){console.warn(e)}
 
-/* ============ DATA PTR — Excel PP14/2026 (Unik saja) ============ */
-/* [td,tr,lat,lng,lintangDMS,bujurDMS,perbatasan,perairan,provinsi,kab,kecamatan,lokasi,koarmada,kodaeral,status] */
+/* ============ VALIDASI URL SUPABASE ============ */
+(function(){
+  var stored=localStorage.getItem('simptr-url-check');
+  if(stored!==SUPABASE_URL){
+    localStorage.clear();
+    localStorage.setItem('simptr-url-check',SUPABASE_URL);
+    console.log('%c SIM-PTR ','background:#00ff9d;color:#000;padding:4px 8px;font-weight:bold','Cache lama dibersihkan, URL Supabase divalidasi');
+  }
+})();
+
+try{
+  if(window.supabase&&SUPABASE_URL&&SUPABASE_URL.includes('supabase.co')&&SUPABASE_URL.length>30){
+    supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+    console.log('%c SUPABASE ','background:#00ff9d;color:#000;padding:4px 8px;font-weight:bold','Terhubung: '+SUPABASE_URL);
+  }else{
+    console.warn('⚠ SUPABASE_URL tidak valid. Mode Demo aktif.');
+  }
+}catch(e){console.error('Supabase init error:',e)}
+
+/* ============ DATA PTR (dari Excel PP14/2026 - Unik saja) ============ */
 var RAW=[
 ["001","001",1.240833,104.575556,"01°14'27\" U","104°34'32\" T","Malaysia","Laut Natuna","Kepri","Bintan","Bintan Pesisir","Pulau Berakit","Koarmada I","Kodaeral IV (Batam)","normal"],
 ["001A","001A",1.047778,104.830556,"01°02'52\" U","104°49'50\" T","Malaysia","Laut Natuna","Kepri","Bintan","Bintan Pesisir","Pulau Sentut","Koarmada I","Kodaeral IV (Batam)","repair"],
@@ -561,12 +574,15 @@ function canEdit(){return role()==='owner'||role()==='admin'}
 function canManageUsers(){return role()==='owner'||role()==='admin'}
 function isOwner(){return role()==='owner'}
 function applyPermissions(){
-  document.getElementById('navUsers').style.display=canManageUsers()?'flex':'none';
-  document.getElementById('btnCatat').style.display=canEdit()?'inline-flex':'none';
-  document.getElementById('navInventory').style.display=canEdit()?'flex':'none';
-  var f=document.getElementById('inventoryForm');
-  if(!canEdit()){f.style.pointerEvents='none';f.style.opacity='.45';document.getElementById('invLocked').style.display='block'}
-  else{f.style.pointerEvents='';f.style.opacity='';document.getElementById('invLocked').style.display='none'}
+  var el=function(id){return document.getElementById(id)};
+  if(el('navUsers'))el('navUsers').style.display=canManageUsers()?'flex':'none';
+  if(el('btnCatat'))el('btnCatat').style.display=canEdit()?'inline-flex':'none';
+  if(el('navInventory'))el('navInventory').style.display=canEdit()?'flex':'none';
+  var f=el('inventoryForm');
+  if(f){
+    if(!canEdit()){f.style.pointerEvents='none';f.style.opacity='.45';if(el('invLocked'))el('invLocked').style.display='block'}
+    else{f.style.pointerEvents='';f.style.opacity='';if(el('invLocked'))el('invLocked').style.display='none'}
+  }
 }
 
 /* ============ TOAST ============ */
@@ -578,20 +594,20 @@ login:function(email,password){if(isDemo())return Promise.resolve({token:'demo',
 getStats:function(){if(isDemo()){var n=PTR_DATA_FULL.filter(function(p){return p.condition_status==='normal'}).length;return Promise.resolve({total:PTR_DATA_FULL.length,normal:n,need_action:PTR_DATA_FULL.length-n,overdue:26,with_cctv:CCTV_CODES.length})}return supabaseClient.from('ptr').select('condition_status,has_cctv').then(function(r){if(r.error)throw new Error(r.error.message);var d=r.data||[];var n=d.filter(function(p){return p.condition_status==='normal'}).length;return{total:d.length,normal:n,need_action:d.length-n,overdue:26,with_cctv:d.filter(function(p){return p.has_cctv}).length}})},
 getPtrList:function(){if(isDemo())return Promise.resolve({data:PTR_DATA_FULL,total:PTR_DATA_FULL.length});return supabaseClient.from('ptr').select('*').order('code').then(function(r){if(r.error)throw new Error(r.error.message);return{data:r.data||[],total:(r.data||[]).length}})},
 getCctvList:function(){if(isDemo())return Promise.resolve({data:PTR_DATA_FULL.filter(function(p){return CCTV_CODES.indexOf(p.code)>=0})});return supabaseClient.from('ptr').select('*').eq('has_cctv',true).order('code').then(function(r){if(r.error)throw new Error(r.error.message);return{data:r.data||[]}})},
-createPtr:function(data){if(!canEdit())throw new Error('Role Anda tidak memiliki hak input data.');if(isDemo()){Toast.show('success','DEMO','Data disimpan lokal');return Promise.resolve({id:'demo-'+Date.now()})}return supabaseClient.from('ptr').insert([{code:data.code,epoch:'2021.0',latitude:data.latitude,longitude:data.longitude,region:data.region,district:data.district,block_code:data.block_code,location_desc:data.location_desc,condition_status:data.condition_status||'normal',tilt_degree:data.tilt_degree||0,notes:data.notes}]).select().single().then(function(r){if(r.error)throw new Error(r.error.message);return r.data})},
+createPtr:function(data){if(!canEdit())return Promise.reject(new Error('Role Anda tidak memiliki hak input data.'));if(isDemo()){Toast.show('success','DEMO','Data disimpan lokal');return Promise.resolve({id:'demo-'+Date.now()})}return supabaseClient.from('ptr').insert([{code:data.code,epoch:'2021.0',latitude:data.latitude,longitude:data.longitude,region:data.region,district:data.district,block_code:data.block_code,location_desc:data.location_desc,condition_status:data.condition_status||'normal',tilt_degree:data.tilt_degree||0,notes:data.notes}]).select().single().then(function(r){if(r.error)throw new Error(r.error.message);return r.data})},
 uploadPhotos:function(id,files){if(isDemo())return Promise.resolve({photos:[]});var up=[],ps=[];for(var i=0;i<files.length;i++){(function(f){var n=id+'/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.'+f.name.split('.').pop();ps.push(supabaseClient.storage.from('ptr-photos').upload(n,f,{upsert:false}).then(function(r){if(!r.error)up.push({file_name:f.name,public_url:supabaseClient.storage.from('ptr-photos').getPublicUrl(n).data.publicUrl})}))})(files[i])}return Promise.all(ps).then(function(){return{photos:up}})},
-listUsers:function(){if(isDemo())return Promise.resolve([{id:'1',full_name:'Operator BNPP',username:'operator',role:'owner',region:'Jakarta',email:'operator@bnpp.go.id'},{id:'2',full_name:'Admin Pusat',username:'adminpusat',role:'admin',region:'Jakarta',email:'admin@bnpp.go.id'},{id:'3',full_name:'Petugas Lapangan Kepri',username:'petugas1',role:'user',region:'Kepri',email:'petugas1@bnpp.go.id'}])},
+listUsers:function(){if(isDemo())return Promise.resolve([{id:'1',full_name:'Operator BNPP',username:'operator',role:'owner',region:'Jakarta',email:'operator@bnpp.go.id'},{id:'2',full_name:'Admin Pusat',username:'adminpusat',role:'admin',region:'Jakarta',email:'admin@bnpp.go.id'},{id:'3',full_name:'Petugas Lapangan Kepri',username:'petugas1',role:'user',region:'Kepri',email:'petugas1@bnpp.go.id'}]);return supabaseClient.from('users').select('*').order('created_at').then(function(r){if(r.error)throw new Error(r.error.message);return r.data||[]})},
 setRole:function(id,newRole){if(isDemo()){Toast.show('success','DEMO','Role diubah');return Promise.resolve()}return supabaseClient.from('users').update({role:newRole}).eq('id',id).then(function(r){if(r.error)throw new Error(r.error.message)})},
 logout:function(){if(!isDemo()&&supabaseClient)return supabaseClient.auth.signOut();return Promise.resolve()}}})();
 
 /* ============ AUTH ============ */
 var Auth=(function(){var ls=document.getElementById('loginScreen'),ma=document.getElementById('mainApp'),lf=document.getElementById('loginForm'),le=document.getElementById('loginError'),lb=document.getElementById('loginBtn');
-function showApp(u){currentUser=u;localStorage.setItem(CONFIG.USER_KEY,JSON.stringify(u));ls.classList.add('hidden');ma.style.display='grid';document.getElementById('userName').textContent=u.fullName||u.username;document.getElementById('userRole').textContent=(u.role||'').toUpperCase()+' · '+(u.region||'—');document.getElementById('userAvatar').textContent=(u.fullName||u.username).substring(0,2).toUpperCase();applyPermissions();Dashboard.init()}
+function showApp(u){currentUser=u;localStorage.setItem(CONFIG.USER_KEY,JSON.stringify(u));ls.classList.add('hidden');ma.style.display='grid';var n=document.getElementById('userName'),r=document.getElementById('userRole'),a=document.getElementById('userAvatar');if(n)n.textContent=u.fullName||u.username;if(r)r.textContent=(u.role||'').toUpperCase()+' · '+(u.region||'—');if(a)a.textContent=(u.fullName||u.username).substring(0,2).toUpperCase();applyPermissions();Dashboard.init()}
 function showLogin(){ls.classList.remove('hidden');ma.style.display='none'}
-var init=function(){if(!supabaseClient){showLogin();return}supabaseClient.auth.getSession().then(function(s){if(s.data&&s.data.session){supabaseClient.from('users').select('*').eq('id',s.data.session.user.id).single().then(function(p){var u={id:s.data.session.user.id,username:(p.data&&p.data.username)||s.data.session.user.email.split('@')[0],fullName:(p.data&&p.data.full_name)||s.data.session.user.email,role:(p.data&&p.data.role)||(p.data?'user':'owner'),region:(p.data&&p.data.region)||'Unknown',email:s.data.session.user.email};showApp(u)}).catch(function(){var u={id:s.data.session.user.id,username:s.data.session.user.email.split('@')[0],fullName:s.data.session.user.email,role:'owner',region:'Unknown',email:s.data.session.user.email};showApp(u)})}else showLogin()}).catch(showLogin)};
-lf.addEventListener('submit',function(e){e.preventDefault();le.classList.remove('show');lb.disabled=true;lb.textContent='MEMPROSES...';API.login(document.getElementById('loginUsername').value,document.getElementById('loginPassword').value).then(function(d){localStorage.setItem(CONFIG.TOKEN_KEY,d.token);localStorage.removeItem(CONFIG.DEMO_MODE_KEY);Toast.show('success','ACCESS GRANTED','Selamat datang '+d.user.fullName);showApp(d.user)}).catch(function(err){le.textContent='⚠ '+err.message;le.classList.add('show')}).finally(function(){lb.disabled=false;lb.textContent='▶ MASUK'})});
-document.getElementById('demoBtn').addEventListener('click',function(){localStorage.setItem(CONFIG.DEMO_MODE_KEY,'true');Toast.show('info','MODE DEMO','Login sebagai Owner (simulasi)');showApp({id:'demo',username:'demo',fullName:'Operator BNPP',role:'owner',region:'Jakarta'})});
-document.getElementById('logoutBtn').addEventListener('click',function(){if(confirm('Keluar sistem?')){API.logout();localStorage.clear();currentUser=null;showLogin()}});
+var init=function(){if(!supabaseClient){showLogin();return}supabaseClient.auth.getSession().then(function(s){if(s.data&&s.data.session){supabaseClient.from('users').select('*').eq('id',s.data.session.user.id).single().then(function(p){var u={id:s.data.session.user.id,username:(p.data&&p.data.username)||s.data.session.user.email.split('@')[0],fullName:(p.data&&p.data.full_name)||s.data.session.user.email,role:(p.data&&p.data.role)||(p.data?'user':'owner'),region:(p.data&&p.data.region)||'Unknown',email:s.data.session.user.email};showApp(u)}).catch(function(){var u={id:s.data.session.user.id,username:s.data.session.user.email.split('@')[0],fullName:s.data.session.user.email,role:'owner',region:'Unknown',email:s.data.session.user.email};showApp(u)})}else showLogin()}).catch(function(){showLogin()})};
+if(lf)lf.addEventListener('submit',function(e){e.preventDefault();if(le)le.classList.remove('show');if(lb){lb.disabled=true;lb.textContent='MEMPROSES...'}var email=document.getElementById('loginUsername').value;var password=document.getElementById('loginPassword').value;API.login(email,password).then(function(d){localStorage.setItem(CONFIG.TOKEN_KEY,d.token);localStorage.removeItem(CONFIG.DEMO_MODE_KEY);Toast.show('success','ACCESS GRANTED','Selamat datang '+d.user.fullName);showApp(d.user)}).catch(function(err){if(le){le.textContent='⚠ '+err.message;le.classList.add('show')}}).finally(function(){if(lb){lb.disabled=false;lb.textContent='▶ MASUK'}})});
+var db=document.getElementById('demoBtn');if(db)db.addEventListener('click',function(){localStorage.setItem(CONFIG.DEMO_MODE_KEY,'true');Toast.show('info','MODE DEMO','Login sebagai Owner (simulasi)');showApp({id:'demo',username:'demo',fullName:'Operator BNPP',role:'owner',region:'Jakarta'})});
+var lb2=document.getElementById('logoutBtn');if(lb2)lb2.addEventListener('click',function(){if(confirm('Keluar sistem?')){API.logout().then(function(){localStorage.clear();currentUser=null;showLogin()})}});
 return{init:init}})();
 
 /* ============ DASHBOARD + PETA ============ */
@@ -601,30 +617,28 @@ var statusLabel={normal:'NORMAL',maintenance:'PERLU PEMELIHARAAN',repair:'PERLU 
 var statusBadge={normal:'st-normal',maintenance:'st-maintenance',repair:'st-repair',relocate:'st-relocate'};
 
 function init(){Promise.all([loadStats(),loadPtrData(),loadCctvData()]).then(function(){initMap();renderCctvGrid()})}
-function loadStats(){return API.getStats().then(function(s){document.getElementById('statTotal').textContent=s.total;document.getElementById('statNormal').textContent=s.normal;document.getElementById('statAction').textContent=s.need_action;document.getElementById('statOverdue').textContent=s.overdue;document.getElementById('statNormalPct').textContent=(s.total?((s.normal/s.total)*100).toFixed(1):0)+'% normal';document.getElementById('statTotalTrend').textContent='▲ 4.2%'})}
-function loadPtrData(){return API.getPtrList().then(function(r){ptrData=r.data||[];document.getElementById('ptrCountBadge').textContent=ptrData.length;document.getElementById('mapActiveCount').textContent=ptrData.length})}
-function loadCctvData(){return API.getCctvList().then(function(r){cctvData=r.data||[];document.getElementById('mapCctvCount').textContent=cctvData.length})}
+function loadStats(){return API.getStats().then(function(s){var el=function(id){return document.getElementById(id)};if(el('statTotal'))el('statTotal').textContent=s.total;if(el('statNormal'))el('statNormal').textContent=s.normal;if(el('statAction'))el('statAction').textContent=s.need_action;if(el('statOverdue'))el('statOverdue').textContent=s.overdue;var pct=s.total>0?((s.normal/s.total)*100).toFixed(1):0;if(el('statNormalPct'))el('statNormalPct').textContent=pct+'% normal';if(el('statTotalTrend'))el('statTotalTrend').textContent='▲ 4.2%'})}
+function loadPtrData(){return API.getPtrList().then(function(r){ptrData=r.data||[];var el=function(id){return document.getElementById(id)};if(el('ptrCountBadge'))el('ptrCountBadge').textContent=ptrData.length;if(el('mapActiveCount'))el('mapActiveCount').textContent=ptrData.length})}
+function loadCctvData(){return API.getCctvList().then(function(r){cctvData=r.data||[];var el=function(id){return document.getElementById(id)};if(el('mapCctvCount'))el('mapCctvCount').textContent=cctvData.length})}
 
 function initMap(){if(map)return;map=L.map('map',{center:[-2.5,118],zoom:5,minZoom:3,maxZoom:18});
-// Esri World Imagery (Satelit - GRATIS, tanpa API key)
 L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri | © OpenStreetMap',maxZoom:19}).addTo(map);
-// Esri Reference Labels (nama tempat)
 labelLayer=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:19}).addTo(map);
 renderMarkers();renderCamChips();
-document.getElementById('filterKoarmada').addEventListener('change',function(e){var sel=e.target.value;Object.keys(markers).forEach(function(k){var m=markers[k];var ptr=ptrData.find(function(p){return p.code===m.code});if(!sel||(ptr&&ptr.koarmada===sel)){map.addLayer(m.marker);if(m.cam)map.addLayer(m.cam)}else{map.removeLayer(m.marker);if(m.cam)map.removeLayer(m.cam)}})});
-document.getElementById('globalSearch').addEventListener('input',function(e){var q=e.target.value.toLowerCase();if(!q)return;var hit=ptrData.find(function(p){return p.code.toLowerCase().indexOf(q)>=0||(p.region||'').toLowerCase().indexOf(q)>=0||(p.location_desc||'').toLowerCase().indexOf(q)>=0});if(hit&&markers[hit.code]){map.setView([hit.latitude,hit.longitude],8);openTac(hit)}})}
+var fk=document.getElementById('filterKoarmada');if(fk)fk.addEventListener('change',function(e){var sel=e.target.value;Object.keys(markers).forEach(function(k){var m=markers[k];var ptr=ptrData.find(function(p){return p.code===m.code});if(!sel||(ptr&&ptr.koarmada===sel)){map.addLayer(m.marker);if(m.cam)map.addLayer(m.cam)}else{map.removeLayer(m.marker);if(m.cam)map.removeLayer(m.cam)}})});
+var gs=document.getElementById('globalSearch');if(gs)gs.addEventListener('input',function(e){var q=e.target.value.toLowerCase();if(!q)return;var hit=ptrData.find(function(p){return p.code.toLowerCase().indexOf(q)>=0||(p.region||'').toLowerCase().indexOf(q)>=0||(p.location_desc||'').toLowerCase().indexOf(q)>=0});if(hit&&markers[hit.code]){map.setView([hit.latitude,hit.longitude],8);openTac(hit)}})}
 
 function renderMarkers(){ptrData.forEach(function(ptr){var color=colorMap[ptr.condition_status]||'#00ff9d';var icon=L.divIcon({html:'<div class="ptr-dot" style="background:'+color+';color:'+color+'"></div>',className:'',iconSize:[14,14],iconAnchor:[7,7]});var m=L.marker([ptr.latitude,ptr.longitude],{icon:icon}).addTo(map);m.bindTooltip('PTR-'+ptr.code+' · '+(ptr.location_desc||''),{direction:'top',offset:[0,-8]});m.on('click',function(){openTac(ptr)});markers[ptr.code]={marker:m,code:ptr.code,cam:null}})}
 
 function renderCamChips(){cctvData.forEach(function(c){var code=(c.code||'').replace('PTR-','');if(!markers[code])return;var html='<div class="cam-chip"><div class="thumb"><div class="road"></div><div class="live">LIVE</div></div><div class="cam-id"><span>CAM-'+code+'</span><span class="sig">▲▲▲</span></div></div>';var icon=L.divIcon({html:html,className:'',iconSize:[158,112],iconAnchor:[79,-10]});var cm=L.marker([c.latitude,c.longitude],{icon:icon,zIndexOffset:500}).addTo(map);cm.on('click',function(){openTac(c)});markers[code].cam=cm;camMarkers[code]=cm})}
 
-/* ---- PANEL DETAIL + CCTV ---- */
-function openTac(ptr){tacPtr=ptr;document.getElementById('tacPanel').classList.add('show');
-document.getElementById('tacCamId').textContent='CAM-'+ptr.code;
-document.getElementById('tacCoords').textContent=ptr.latitude.toFixed(4)+', '+ptr.longitude.toFixed(4);
+function openTac(ptr){tacPtr=ptr;var p=document.getElementById('tacPanel');if(p)p.classList.add('show');
+var el=function(id){return document.getElementById(id)};
+if(el('tacCamId'))el('tacCamId').textContent='CAM-'+ptr.code;
+if(el('tacCoords'))el('tacCoords').textContent=ptr.latitude.toFixed(4)+', '+ptr.longitude.toFixed(4);
 var st=ptr.condition_status||'normal';
 var hasCam=CCTV_CODES.indexOf((ptr.code||'').replace('PTR-',''))>=0||ptr.has_cctv;
-document.getElementById('detailGrid').innerHTML=
+if(el('detailGrid'))el('detailGrid').innerHTML=
 '<div class="d"><span class="k">Kode TD</span><span class="v hl">'+ptr.code+'</span></div>'+
 '<div class="d"><span class="k">Kode TR</span><span class="v">'+(ptr.tr||ptr.code)+'</span></div>'+
 '<div class="d"><span class="k">Lintang</span><span class="v">'+(ptr.lintDms||ptr.latitude+'°')+'</span></div>'+
@@ -638,55 +652,53 @@ document.getElementById('detailGrid').innerHTML=
 '<div class="d"><span class="k">Perairan</span><span class="v">'+(ptr.perairan||'—')+'</span></div>'+
 '<div class="d"><span class="k">Koarmada</span><span class="v hl">'+(ptr.koarmada||'—')+'</span></div>'+
 '<div class="d"><span class="k">Kodaeral</span><span class="v hl">'+(ptr.kodaeral||'—')+'</span></div>';
-var fw=document.getElementById('feedWrap');
+var fw=el('feedWrap');
+if(fw){
 if(hasCam){fw.innerHTML='<div class="feed" id="tacFeed"><div class="sky"></div><div class="road"></div><div class="lane"></div><div class="car"></div><div class="car2"></div><div class="aibox b1" data-l="VEH-01"></div><div class="aibox b2" data-l="TRUCK-02"></div><div class="scan"></div><div class="stamp">'+new Date().toLocaleString('id-ID')+'</div><div class="livebadge">LIVE FEED</div></div><div class="tac-actions"><button class="tac-btn" id="tacAi">◎ AI ANALYZE</button><button class="tac-btn" id="tacWatch">▶ WATCH 30S</button></div><div style="display:flex;align-items:center;gap:12px;padding:8px 0 0;font-family:var(--mono);font-size:9px;color:var(--text-muted)"><span>FEED TYPE <b style="color:var(--primary)">HLS</b></span><span>STATUS <b style="color:var(--danger)">● ACTIVE / RECORDING</b></span><span style="margin-left:auto;color:var(--primary);cursor:pointer" id="tacTarget">⌖ MAP TARGET</span></div>';
-document.getElementById('tacAi').addEventListener('click',function(){var f=document.getElementById('tacFeed');f.classList.toggle('ai-on');this.classList.toggle('active');Toast.show('info','AI ANALYZE',f.classList.contains('ai-on')?'2 objek terdeteksi · VEH-01, TRUCK-02':'Analisis dihentikan')});
-document.getElementById('tacWatch').addEventListener('click',function(){var b=this;if(watchTimer){clearInterval(watchTimer);watchTimer=null;b.classList.remove('active');b.textContent='▶ WATCH 30S';return}var left=30;b.classList.add('active');b.textContent='⏸ 30s';watchTimer=setInterval(function(){left--;b.textContent='⏸ '+left+'s';if(left<=0){clearInterval(watchTimer);watchTimer=null;b.classList.remove('active');b.textContent='▶ WATCH 30S';Toast.show('success','WATCH SELESAI','Klip 30s disimpan')}},1000)});
-document.getElementById('tacTarget').addEventListener('click',function(){if(map)map.flyTo([tacPtr.latitude,tacPtr.longitude],12,{duration:1.2})});
-}else{fw.innerHTML='<div class="nocam">○ TIDAK ADA UPLINK CCTV PADA PTR INI<br><span style="font-size:9px">Detail tetap tersedia di atas</span></div>'}
+var ai=el('tacAi');if(ai)ai.addEventListener('click',function(){var f=el('tacFeed');if(f){f.classList.toggle('ai-on');this.classList.toggle('active');Toast.show('info','AI ANALYZE',f.classList.contains('ai-on')?'2 objek terdeteksi · VEH-01, TRUCK-02':'Analisis dihentikan')}});
+var w=el('tacWatch');if(w)w.addEventListener('click',function(){var b=this;if(watchTimer){clearInterval(watchTimer);watchTimer=null;b.classList.remove('active');b.textContent='▶ WATCH 30S';return}var left=30;b.classList.add('active');b.textContent='⏸ 30s';watchTimer=setInterval(function(){left--;b.textContent='⏸ '+left+'s';if(left<=0){clearInterval(watchTimer);watchTimer=null;b.classList.remove('active');b.textContent='▶ WATCH 30S';Toast.show('success','WATCH SELESAI','Klip 30s disimpan')}},1000)});
+var t=el('tacTarget');if(t)t.addEventListener('click',function(){if(map&&tacPtr)map.flyTo([tacPtr.latitude,tacPtr.longitude],12,{duration:1.2})});
+}else{fw.innerHTML='<div class="nocam">○ TIDAK ADA UPLINK CCTV PADA PTR INI<br><span style="font-size:9px">Detail tetap tersedia di atas</span></div>'}}
 if(map)map.setView([ptr.latitude,ptr.longitude],Math.max(map.getZoom(),7))}
-document.getElementById('tacClose')&&0;
-document.addEventListener('click',function(e){if(e.target.closest('#tacCloseX'))document.getElementById('tacPanel').classList.remove('show')});
-setInterval(function(){var t=new Date().toTimeString().split(' ')[0];var c=document.getElementById('tacClock');if(c)c.textContent=t;document.querySelectorAll('[data-clock]').forEach(function(x){x.textContent=t})},1000);
 
-function renderCctvGrid(){var g=document.getElementById('cctvGrid');g.innerHTML='';cctvData.forEach(function(c){var tile=document.createElement('div');tile.className='cctv-tile';tile.innerHTML='<div class="feedmini"></div><div class="cctv-label"><span class="rec"></span>PTR-'+(c.code||'').replace('PTR-','')+' · LIVE</div><div class="cctv-time" data-clock>--:--:--</div>';tile.addEventListener('click',function(){openTac(c)});g.appendChild(tile)})}
-document.getElementById('cctvReset').addEventListener('click',function(){document.getElementById('tacPanel').classList.remove('show')});
+function renderCctvGrid(){var g=document.getElementById('cctvGrid');if(!g)return;g.innerHTML='';cctvData.forEach(function(c){var tile=document.createElement('div');tile.className='cctv-tile';tile.innerHTML='<div class="feedmini"></div><div class="cctv-label"><span class="rec"></span>PTR-'+(c.code||'').replace('PTR-','')+' · LIVE</div><div class="cctv-time" data-clock>--:--:--</div>';tile.addEventListener('click',function(){openTac(c)});g.appendChild(tile)})}
+var cr=document.getElementById('cctvReset');if(cr)cr.addEventListener('click',function(){var p=document.getElementById('tacPanel');if(p)p.classList.remove('show')});
 
-document.getElementById('railLayers').addEventListener('click',function(){document.getElementById('layerPanel').classList.toggle('show');this.classList.toggle('on')});
-document.getElementById('railCctv').addEventListener('click',function(){document.getElementById('cctvPanel').scrollIntoView({behavior:'smooth'})});
-document.getElementById('railAnalytics').addEventListener('click',function(){Reports.open()});
-document.querySelectorAll('.switch').forEach(function(sw){sw.addEventListener('click',function(){this.classList.toggle('on');var on=this.classList.contains('on'),k=this.dataset.layer;if(k==='labels'){if(on)labelLayer.addTo(map);else map.removeLayer(labelLayer)}if(k==='cctv'){Object.keys(camMarkers).forEach(function(c){if(on)map.addLayer(camMarkers[c]);else map.removeLayer(camMarkers[c])})}if(k==='glow'){document.querySelectorAll('.ptr-dot').forEach(function(d){d.style.boxShadow=on?'':'none';d.style.animation=on?'':'none'})}})});
+var rl=document.getElementById('railLayers');if(rl)rl.addEventListener('click',function(){var p=document.getElementById('layerPanel');if(p)p.classList.toggle('show');this.classList.toggle('on')});
+var rc=document.getElementById('railCctv');if(rc)rc.addEventListener('click',function(){var p=document.getElementById('cctvPanel');if(p)p.scrollIntoView({behavior:'smooth'})});
+var ra=document.getElementById('railAnalytics');if(ra)ra.addEventListener('click',function(){Reports.open()});
+document.querySelectorAll('.switch').forEach(function(sw){sw.addEventListener('click',function(){this.classList.toggle('on');var on=this.classList.contains('on'),k=this.dataset.layer;if(k==='labels'){if(on&&labelLayer)labelLayer.addTo(map);else if(labelLayer)map.removeLayer(labelLayer)}if(k==='cctv'){Object.keys(camMarkers).forEach(function(c){if(on)map.addLayer(camMarkers[c]);else map.removeLayer(camMarkers[c])})}if(k==='glow'){document.querySelectorAll('.ptr-dot').forEach(function(d){d.style.boxShadow=on?'':'none';d.style.animation=on?'':'none'})}})});
 
 return{init:init,getPtrData:function(){return ptrData},openTac:openTac}})();
 
 /* ============ KELOLA USER ============ */
 var Users=(function(){var modal=document.getElementById('usersModal');
-function open(){API.listUsers().then(function(list){var tb=document.getElementById('usersTbody');tb.innerHTML='';list.forEach(function(u){var canEditThis=(isOwner()&&u.role!=='owner')||(role()==='admin'&&u.role==='user');var tr=document.createElement('tr');
+function open(){API.listUsers().then(function(list){var tb=document.getElementById('usersTbody');if(!tb)return;tb.innerHTML='';list.forEach(function(u){var canEditThis=(isOwner()&&u.role!=='owner')||(role()==='admin'&&u.role==='user');var tr=document.createElement('tr');
 tr.innerHTML='<td>'+(u.full_name||u.username)+'</td><td>'+(u.email||'—')+'</td>'+
 '<td><select class="select" style="padding:4px 8px;font-size:11px" '+(canEditThis?'':'disabled')+'>'+['user','admin','owner'].map(function(r){return'<option value="'+r+'"'+(u.role===r?' selected':'')+'>'+r.toUpperCase()+'</option>'}).join('')+'</select></td>'+
 '<td><span class="badge-st st-normal">AKTIF</span></td>'+
 '<td>'+(canEditThis?'<button class="btn btn-ghost" style="padding:4px 10px;font-size:10px" data-id="'+u.id+'">Simpan</button>':'<span style="color:var(--text-subtle);font-size:10px">🔒</span>')+'</td>';
 tb.appendChild(tr)});
 tb.querySelectorAll('select').forEach(function(sel){sel.addEventListener('change',function(){var id=sel.closest('tr').querySelector('[data-id]').dataset.id;API.setRole(id,sel.value).then(function(){Toast.show('success','ROLE DIUBAH','Role disimpan ke database')}).catch(function(e){Toast.show('error','GAGAL',e.message)})})});
-modal.classList.add('show')})}
-document.getElementById('closeUsers').addEventListener('click',function(){modal.classList.remove('show')});
-document.getElementById('navUsers').addEventListener('click',open);
+if(modal)modal.classList.add('show')})}
+var cu=document.getElementById('closeUsers');if(cu)cu.addEventListener('click',function(){if(modal)modal.classList.remove('show')});
+var nu=document.getElementById('navUsers');if(nu)nu.addEventListener('click',function(e){e.preventDefault();open()});
 return{open:open}})();
 
 /* ============ INVENTARISASI ============ */
 var Inventory=(function(){var form=document.getElementById('inventoryForm'),btnGps=document.getElementById('btnGps'),photoDrop=document.getElementById('photoDrop'),photoInput=document.getElementById('photoInput'),inspectionType=document.getElementById('inspectionType'),selectedPhotos=[],inspectionTypeValue='rutin';
-btnGps.addEventListener('click',function(){btnGps.textContent='◉ AKUISISI GPS...';if(navigator.geolocation)navigator.geolocation.getCurrentPosition(function(pos){document.getElementById('lat').textContent=pos.coords.latitude.toFixed(6)+'°';document.getElementById('lng').textContent=pos.coords.longitude.toFixed(6)+'°';btnGps.textContent='◉ GPS LOCKED';Toast.show('success','GPS LOCK','Koordinat terkunci')},function(){document.getElementById('lat').textContent=(-6.2+Math.random()*0.1).toFixed(6)+'°';document.getElementById('lng').textContent=(106.8+Math.random()*0.1).toFixed(6)+'°';btnGps.textContent='◉ GPS SIMULASI';Toast.show('warning','GPS N/A','Simulasi koordinat')},{enableHighAccuracy:true,timeout:10000})});
-photoDrop.addEventListener('click',function(){photoInput.click()});photoInput.addEventListener('change',function(e){handleFiles(e.target.files)});['dragenter','dragover'].forEach(function(ev){photoDrop.addEventListener(ev,function(e){e.preventDefault();photoDrop.classList.add('dragover')})});['dragleave','drop'].forEach(function(ev){photoDrop.addEventListener(ev,function(e){e.preventDefault();photoDrop.classList.remove('dragover')})});photoDrop.addEventListener('drop',function(e){handleFiles(e.dataTransfer.files)});
-function handleFiles(files){selectedPhotos=selectedPhotos.concat(Array.from(files)).slice(0,3);if(selectedPhotos.length)photoDrop.innerHTML='<strong>'+selectedPhotos.length+' foto terpilih</strong><span>'+selectedPhotos.map(function(f){return f.name}).join(', ')+'</span><input type="file" id="photoInput" accept="image/*" multiple style="display:none"/>';document.getElementById('photoInput').addEventListener('change',function(e){handleFiles(e.target.files)})}
-inspectionType.addEventListener('click',function(e){if(e.target.classList.contains('chip')){inspectionType.querySelectorAll('.chip').forEach(function(c){c.classList.remove('active')});e.target.classList.add('active');inspectionTypeValue=e.target.dataset.value}});
-form.addEventListener('submit',function(e){e.preventDefault();if(!canEdit()){Toast.show('error','DITOLAK','Role Anda tidak memiliki hak input.');return}var btn=document.getElementById('btnSubmit');btn.disabled=true;btn.textContent='MENYIMPAN...';var fd=new FormData(form);var data={code:fd.get('code'),latitude:parseFloat(document.getElementById('lat').textContent),longitude:parseFloat(document.getElementById('lng').textContent),region:fd.get('region'),district:fd.get('district'),block_code:fd.get('block_code'),location_desc:fd.get('location_desc'),condition_status:fd.get('condition_status'),tilt_degree:parseFloat(fd.get('tilt_degree'))||0,notes:fd.get('notes')};API.createPtr(data).then(function(r){if(selectedPhotos.length&&r.id)return API.uploadPhotos(r.id,selectedPhotos)}).then(function(){Toast.show('success','DATA TERSIMPAN','PTR '+data.code+' diarsipkan');form.reset();selectedPhotos=[];Dashboard.init()}).catch(function(err){Toast.show('error','GAGAL',err.message)}).finally(function(){btn.disabled=false;btn.textContent='▶ SIMPAN'})});
-document.getElementById('btnSaveDraft').addEventListener('click',function(){var fd=new FormData(form);var dr=JSON.parse(localStorage.getItem('simptr-drafts')||'[]');dr.push({code:fd.get('code'),saved_at:new Date().toISOString()});localStorage.setItem('simptr-drafts',JSON.stringify(dr));document.getElementById('draftStatus').textContent='Draft · '+dr.length;Toast.show('info','DRAFT','Tersimpan lokal')});
-document.getElementById('btnCatat').addEventListener('click',function(){document.getElementById('inventoryPanel').scrollIntoView({behavior:'smooth'})});
+if(btnGps)btnGps.addEventListener('click',function(){btnGps.textContent='◉ AKUISISI GPS...';if(navigator.geolocation)navigator.geolocation.getCurrentPosition(function(pos){var le=document.getElementById('lat'),ln=document.getElementById('lng');if(le)le.textContent=pos.coords.latitude.toFixed(6)+'°';if(ln)ln.textContent=pos.coords.longitude.toFixed(6)+'°';btnGps.textContent='◉ GPS LOCKED';Toast.show('success','GPS LOCK','Koordinat terkunci')},function(){var le=document.getElementById('lat'),ln=document.getElementById('lng');if(le)le.textContent=(-6.2+Math.random()*0.1).toFixed(6)+'°';if(ln)ln.textContent=(106.8+Math.random()*0.1).toFixed(6)+'°';btnGps.textContent='◉ GPS SIMULASI';Toast.show('warning','GPS N/A','Simulasi koordinat')},{enableHighAccuracy:true,timeout:10000})});
+if(photoDrop){photoDrop.addEventListener('click',function(){if(photoInput)photoInput.click()});if(photoInput)photoInput.addEventListener('change',function(e){handleFiles(e.target.files)});['dragenter','dragover'].forEach(function(ev){photoDrop.addEventListener(ev,function(e){e.preventDefault();photoDrop.classList.add('dragover')})});['dragleave','drop'].forEach(function(ev){photoDrop.addEventListener(ev,function(e){e.preventDefault();photoDrop.classList.remove('dragover')})});photoDrop.addEventListener('drop',function(e){handleFiles(e.dataTransfer.files)})}
+function handleFiles(files){selectedPhotos=selectedPhotos.concat(Array.from(files)).slice(0,3);if(selectedPhotos.length&&photoDrop){photoDrop.innerHTML='<strong>'+selectedPhotos.length+' foto terpilih</strong><span>'+selectedPhotos.map(function(f){return f.name}).join(', ')+'</span><input type="file" id="photoInput" accept="image/*" multiple style="display:none"/>';var np=document.getElementById('photoInput');if(np)np.addEventListener('change',function(e){handleFiles(e.target.files)})}}
+if(inspectionType)inspectionType.addEventListener('click',function(e){if(e.target.classList.contains('chip')){inspectionType.querySelectorAll('.chip').forEach(function(c){c.classList.remove('active')});e.target.classList.add('active');inspectionTypeValue=e.target.dataset.value}});
+if(form)form.addEventListener('submit',function(e){e.preventDefault();if(!canEdit()){Toast.show('error','DITOLAK','Role Anda tidak memiliki hak input.');return}var btn=document.getElementById('btnSubmit');if(btn){btn.disabled=true;btn.textContent='MENYIMPAN...'}var fd=new FormData(form);var data={code:fd.get('code'),latitude:parseFloat(document.getElementById('lat').textContent),longitude:parseFloat(document.getElementById('lng').textContent),region:fd.get('region'),district:fd.get('district'),block_code:fd.get('block_code'),location_desc:fd.get('location_desc'),condition_status:fd.get('condition_status'),tilt_degree:parseFloat(fd.get('tilt_degree'))||0,notes:fd.get('notes')};API.createPtr(data).then(function(r){if(selectedPhotos.length&&r.id)return API.uploadPhotos(r.id,selectedPhotos)}).then(function(){Toast.show('success','DATA TERSIMPAN','PTR '+data.code+' diarsipkan');form.reset();selectedPhotos=[];Dashboard.init()}).catch(function(err){Toast.show('error','GAGAL',err.message)}).finally(function(){if(btn){btn.disabled=false;btn.textContent='▶ SIMPAN'}})});
+var bd=document.getElementById('btnSaveDraft');if(bd)bd.addEventListener('click',function(){var fd=new FormData(form);var dr=JSON.parse(localStorage.getItem('simptr-drafts')||'[]');dr.push({code:fd.get('code'),saved_at:new Date().toISOString()});localStorage.setItem('simptr-drafts',JSON.stringify(dr));var ds=document.getElementById('draftStatus');if(ds)ds.textContent='Draft · '+dr.length;Toast.show('info','DRAFT','Tersimpan lokal')});
+var bc=document.getElementById('btnCatat');if(bc)bc.addEventListener('click',function(){var p=document.getElementById('inventoryPanel');if(p)p.scrollIntoView({behavior:'smooth'})});
 return{}})();
 
 /* ============ LAPORAN ============ */
 var Reports=(function(){var modal=document.getElementById('reportsModal'),charts={};
-function open(){modal.classList.add('show');renderCharts();renderSummary()}
+function open(){if(modal)modal.classList.add('show');renderCharts();renderSummary()}
 function renderCharts(){var d=Dashboard.getPtrData();Object.keys(charts).forEach(function(k){if(charts[k])charts[k].destroy()});charts={};
 var cc={normal:d.filter(function(p){return p.condition_status==='normal'}).length,maintenance:d.filter(function(p){return p.condition_status==='maintenance'}).length,repair:d.filter(function(p){return p.condition_status==='repair'}).length,relocate:d.filter(function(p){return p.condition_status==='relocate'}).length};
 charts.c=new Chart(document.getElementById('chartCondition'),{type:'doughnut',data:{labels:['Normal','Pemeliharaan','Perbaikan','Relokasi'],datasets:[{data:[cc.normal,cc.maintenance,cc.repair,cc.relocate],backgroundColor:['#00ff9d','#ffb020','#ff4d4d','#b45309'],borderWidth:0}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#7fa894',font:{size:10}}}}}});
@@ -696,21 +708,21 @@ var rc={};d.forEach(function(p){rc[p.region]=(rc[p.region]||0)+1});var sr=Object
 charts.r=new Chart(document.getElementById('chartRegion'),{type:'bar',data:{labels:sr.map(function(x){return x[0]}),datasets:[{data:sr.map(function(x){return x[1]}),backgroundColor:'#ffb020',borderRadius:6}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#7fa894'},grid:{color:'rgba(255,255,255,.05)'}},y:{ticks:{color:'#7fa894'},grid:{display:false}}}}});
 var w=CCTV_CODES.length;
 charts.v=new Chart(document.getElementById('chartCctv'),{type:'pie',data:{labels:['Uplink CCTV','Tanpa CCTV'],datasets:[{data:[w,d.length-w],backgroundColor:['#00ff9d','#2a4038'],borderWidth:0}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#7fa894',font:{size:10}}}}}})}
-function renderSummary(){var d=Dashboard.getPtrData(),t=d.length,n=d.filter(function(p){return p.condition_status==='normal'}).length;document.getElementById('reportSummary').innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div>TOTAL PTR: <b style="color:var(--primary)">'+t+'</b></div><div>NORMAL: <b style="color:var(--primary)">'+n+'</b> ('+((n/t)*100).toFixed(1)+'%)</div><div>PEMELIHARAAN: <b style="color:var(--accent)">'+d.filter(function(p){return p.condition_status==='maintenance'}).length+'</b></div><div>PERBAIKAN: <b style="color:var(--danger)">'+d.filter(function(p){return p.condition_status==='repair'}).length+'</b></div><div>RELOKASI: <b style="color:#d97706">'+d.filter(function(p){return p.condition_status==='relocate'}).length+'</b></div><div>UPLINK CCTV: <b style="color:var(--primary)">'+CCTV_CODES.length+'</b></div></div><div style="margin-top:8px;border-top:1px dashed var(--border);padding-top:8px">DICETAK: '+new Date().toLocaleString('id-ID')+'</div>'}
+function renderSummary(){var d=Dashboard.getPtrData(),t=d.length,n=d.filter(function(p){return p.condition_status==='normal'}).length;var rs=document.getElementById('reportSummary');if(rs)rs.innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div>TOTAL PTR: <b style="color:var(--primary)">'+t+'</b></div><div>NORMAL: <b style="color:var(--primary)">'+n+'</b> ('+((n/t)*100).toFixed(1)+'%)</div><div>PEMELIHARAAN: <b style="color:var(--accent)">'+d.filter(function(p){return p.condition_status==='maintenance'}).length+'</b></div><div>PERBAIKAN: <b style="color:var(--danger)">'+d.filter(function(p){return p.condition_status==='repair'}).length+'</b></div><div>RELOKASI: <b style="color:#d97706">'+d.filter(function(p){return p.condition_status==='relocate'}).length+'</b></div><div>UPLINK CCTV: <b style="color:var(--primary)">'+CCTV_CODES.length+'</b></div></div><div style="margin-top:8px;border-top:1px dashed var(--border);padding-top:8px">DICETAK: '+new Date().toLocaleString('id-ID')+'</div>'}
 function rows(){return Dashboard.getPtrData().map(function(p){return{'Kode TD':p.code,'Kode TR':p.tr,'Provinsi':p.region,'Kab/Kota':p.district,'Kecamatan':p.block_code,'Lokasi':p.location_desc,'Lintang':p.lintDms||p.latitude,'Bujur':p.bujDms||p.longitude,'Koarmada':p.koarmada,'Kodaeral':p.kodaeral,'Perbatasan':p.perbatasan,'Perairan':p.perairan,'Kondisi':p.condition_status}})}
 function exportCSV(){var r=rows();var h=Object.keys(r[0]);var csv=[h].concat(r.map(function(o){return h.map(function(k){return'"'+(o[k]||'')+'"'}).join(',')})).join('\n');var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='SIM-PTR-Laporan.csv';a.click();Toast.show('success','CSV OK',r.length+' baris')}
 function exportExcel(){var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows()),'PTR');XLSX.writeFile(wb,'SIM-PTR-Laporan.xlsx');Toast.show('success','EXCEL OK')}
 function exportPDF(){var doc=new window.jspdf.jsPDF('landscape');var r=rows();doc.setFontSize(15);doc.text('Sistem Informasi Monitoring PTR — BNPP',14,16);doc.setFontSize(9);doc.text('Badan Nasional Pengelola Perbatasan dan Daerah Terpencil | Dicetak: '+new Date().toLocaleString('id-ID'),14,23);doc.autoTable({startY:28,head:[['Kode','Provinsi','Lokasi','Koarmada','Kodaeral','Kondisi']],body:r.map(function(o){return[o['Kode TD'],o.Provinsi,o.Lokasi,o.Koarmada,o.Kodaeral,o.Kondisi]}),styles:{fontSize:7},headStyles:{fillColor:[13,148,136]}});doc.save('SIM-PTR-Laporan.pdf');Toast.show('success','PDF OK')}
-document.getElementById('navReports').addEventListener('click',open);
-document.getElementById('closeReports').addEventListener('click',function(){modal.classList.remove('show')});
-document.getElementById('btnExportCSV').addEventListener('click',exportCSV);
-document.getElementById('btnExportExcel').addEventListener('click',exportExcel);
-document.getElementById('btnExportPDF').addEventListener('click',exportPDF);
-modal.addEventListener('click',function(e){if(e.target===modal)modal.classList.remove('show')});
+var nr=document.getElementById('navReports');if(nr)nr.addEventListener('click',function(e){e.preventDefault();open()});
+var cr=document.getElementById('closeReports');if(cr)cr.addEventListener('click',function(){if(modal)modal.classList.remove('show')});
+var bc=document.getElementById('btnExportCSV');if(bc)bc.addEventListener('click',exportCSV);
+var be=document.getElementById('btnExportExcel');if(be)be.addEventListener('click',exportExcel);
+var bp=document.getElementById('btnExportPDF');if(bp)bp.addEventListener('click',exportPDF);
+if(modal)modal.addEventListener('click',function(e){if(e.target===modal)modal.classList.remove('show')});
 return{open:open}})();
 
 /* ============ THEME / NAV / OFFLINE ============ */
-(function(){var root=document.documentElement,btn=document.getElementById('themeToggle'),saved=localStorage.getItem('simptr-theme');if(saved)root.setAttribute('data-theme',saved);btn.addEventListener('click',function(){var n=root.getAttribute('data-theme')==='dark'?'light':'dark';root.setAttribute('data-theme',n);localStorage.setItem('simptr-theme',n)})})();
+(function(){var root=document.documentElement,btn=document.getElementById('themeToggle'),saved=localStorage.getItem('simptr-theme');if(saved)root.setAttribute('data-theme',saved);if(btn)btn.addEventListener('click',function(){var n=root.getAttribute('data-theme')==='dark'?'light':'dark';root.setAttribute('data-theme',n);localStorage.setItem('simptr-theme',n)})})();
 (function(){var items=document.querySelectorAll('.nav-item');items.forEach(function(it){it.addEventListener('click',function(e){if(it.id==='navReports'||it.id==='navUsers')return;e.preventDefault();items.forEach(function(i){i.classList.remove('active')});it.classList.add('active')})})})();
 (function(){var b=document.getElementById('offlineBanner'),u=function(){if(b)b.classList.toggle('show',!navigator.onLine)};window.addEventListener('online',function(){u();Toast.show('success','LINK RESTORED','Sinkronisasi berjalan');Dashboard.init()});window.addEventListener('offline',u);u()})();
 
