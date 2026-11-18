@@ -6,6 +6,7 @@
 <title>Sistem Informasi Monitoring PTR — BNPP</title>
 <meta name="theme-color" content="#00ff9d" />
 <link rel="icon" type="image/png" href="logo-bnpp.png" />
+<link rel="apple-touch-icon" href="logo-bnpp.png" />
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -15,7 +16,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.0/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-:root{--bg:#060a09;--bg-elev:#0a100e;--bg-soft:#0e1613;--surface:#0c1411;--surface-hover:#121d19;--border:#1c2b26;--border-strong:#2a4038;--text:#d9f2e6;--text-muted:#7fa894;--text-subtle:#4d6b5e;--primary:#00ff9d;--primary-hover:#5effc4;--primary-soft:rgba(0,255,157,.1);--accent:#ffb020;--danger:#ff4d4d;--danger-soft:rgba(255,77,77,.12);--warning:#ffd23f;--glow:0 0 12px rgba(0,255,157,.35);--shadow-lg:0 12px 40px rgba(0,0,0,.6);--radius-sm:8px;--radius-md:12px;--radius-lg:16px;--radius-xl:20px;--transition:180ms cubic-bezier(.4,0,.2,1);--sidebar-w:240px;--mono:'JetBrains Mono',monospace}
+:root{--bg:#060a09;--bg-elev:#0a100e;--bg-soft:#0e1613;--surface:#0c1411;--surface-hover:#121d19;--border:#1c2b26;--border-strong:#2a4038;--text:#d9f2e6;--text-muted:#7fa894;--text-subtle:#4d6b5e;--primary:#00ff9d;--primary-hover:#5effc4;--primary-soft:rgba(0,255,157,.1);--accent:#ffb020;--danger:#ff4d4d;--danger-soft:rgba(255,77,77,.12);--warning:#ffd23f;--warning-soft:rgba(255,210,63,.12);--glow:0 0 12px rgba(0,255,157,.35);--shadow-lg:0 12px 40px rgba(0,0,0,.6);--radius-sm:8px;--radius-md:12px;--radius-lg:16px;--radius-xl:20px;--transition:180ms cubic-bezier(.4,0,.2,1);--sidebar-w:240px;--mono:'JetBrains Mono',monospace}
 [data-theme="light"]{--bg:#f2f5f3;--bg-elev:#fff;--bg-soft:#e8efe9;--surface:#fff;--surface-hover:#f0f5f1;--border:#d5e0d8;--border-strong:#b9c9bf;--text:#0c1a14;--text-muted:#4a5f55;--text-subtle:#8aa093;--primary:#0d9488;--primary-hover:#0f766e;--primary-soft:rgba(13,148,136,.1);--accent:#d97706;--danger:#dc2626;--danger-soft:rgba(220,38,38,.1);--glow:0 0 8px rgba(13,148,136,.25)}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;line-height:1.55;color:var(--text);background:var(--bg)}
@@ -63,7 +64,6 @@ a{color:inherit;text-decoration:none}
 .btn-primary:hover{background:var(--primary-hover)}
 .btn-ghost{background:var(--surface);color:var(--text);border-color:var(--border)}
 .btn-ghost:hover{border-color:var(--primary);color:var(--primary)}
-.btn-danger{background:transparent;color:var(--danger);border-color:rgba(255,77,77,.4)}
 .btn:disabled{opacity:.4;cursor:not-allowed}
 .login-screen{position:fixed;inset:0;background:radial-gradient(circle at 50% 30%,#0c1f18 0%,#040807 70%);display:grid;place-items:center;z-index:100}
 .login-screen.hidden{display:none}
@@ -74,7 +74,7 @@ a{color:inherit;text-decoration:none}
 .login-header p{font-size:11px;color:var(--text-muted);font-family:var(--mono);margin-top:3px}
 .login-field{display:flex;flex-direction:column;gap:5px;margin-bottom:13px}
 .login-field label{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono)}
-.login-field input{background:var(--bg-soft);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;font-size:13px;outline:none;font-family:var(--mono)}
+.login-field input{background:var(--bg-soft);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;font-size:13px;outline:none;font-family:var(--mono);width:100%}
 .login-field input:focus{border-color:var(--primary);box-shadow:var(--glow)}
 .login-btn{width:100%;background:var(--primary);color:#00150c;padding:11px;border-radius:var(--radius-sm);font-size:12px;font-weight:800;margin-top:6px;letter-spacing:.1em;text-transform:uppercase;font-family:var(--mono)}
 .login-error{background:var(--danger-soft);color:var(--danger);border:1px solid rgba(255,77,77,.3);padding:9px 12px;border-radius:var(--radius-sm);font-size:11.5px;margin-bottom:12px;display:none;font-family:var(--mono)}
@@ -123,11 +123,10 @@ a{color:inherit;text-decoration:none}
 .layer-panel.show{display:block}
 .layer-panel h4{font-size:10px;font-family:var(--mono);letter-spacing:.12em;color:var(--primary);margin-bottom:10px;text-transform:uppercase}
 .layer-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;font-size:11px;color:var(--text-muted);font-family:var(--mono);border-bottom:1px dashed rgba(255,255,255,.06)}
-.switch{position:relative;width:34px;height:18px;background:var(--bg-soft);border:1px solid var(--border-strong);border-radius:20px;flex-shrink:0}
+.switch{position:relative;width:34px;height:18px;background:var(--bg-soft);border:1px solid var(--border-strong);border-radius:20px;flex-shrink:0;cursor:pointer}
 .switch::after{content:'';position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:var(--text-subtle);transition:all var(--transition)}
 .switch.on{background:var(--primary-soft);border-color:var(--primary)}
 .switch.on::after{left:18px;background:var(--primary);box-shadow:0 0 6px var(--primary)}
-/* DETAIL + CCTV PANEL */
 .tac-panel{position:absolute;top:12px;left:12px;width:400px;max-width:calc(100% - 80px);background:rgba(5,10,8,.95);border:1px solid var(--primary);border-radius:var(--radius-md);z-index:950;display:none;backdrop-filter:blur(10px);box-shadow:0 0 40px rgba(0,255,157,.18);overflow:hidden}
 .tac-panel.show{display:block;animation:fadeUp .3s both}
 .tac-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;background:rgba(0,255,157,.08);border-bottom:1px solid rgba(0,255,157,.25);font-family:var(--mono);font-size:10px;color:var(--primary);flex-wrap:wrap}
@@ -140,8 +139,6 @@ a{color:inherit;text-decoration:none}
 .detail-grid .k{font-size:8.5px;font-family:var(--mono);letter-spacing:.08em;color:var(--text-subtle);text-transform:uppercase}
 .detail-grid .v{font-size:11.5px;font-family:var(--mono);color:var(--text);word-break:break-word}
 .detail-grid .v.hl{color:var(--primary);font-weight:700}
-.detail-grid .v.bad{color:var(--danger);font-weight:700}
-.detail-grid .v.warn{color:var(--accent);font-weight:700}
 .badge-st{display:inline-block;padding:2px 9px;border-radius:10px;font-size:9.5px;font-weight:800;font-family:var(--mono);letter-spacing:.05em}
 .st-normal{background:rgba(0,255,157,.12);color:var(--primary)}
 .st-maintenance{background:rgba(255,176,32,.12);color:var(--accent)}
@@ -231,7 +228,7 @@ table.utab tr:hover td{background:var(--bg-soft)}
 .animate-in{animation:fadeUp .4s both}
 .offline-banner{position:fixed;top:0;left:0;right:0;background:var(--accent);color:#000;padding:7px;text-align:center;font-size:11px;font-weight:800;z-index:300;display:none;font-family:var(--mono)}
 .offline-banner.show{display:block}
-.locked-note{padding:10px 16px;background:var(--danger-soft);color:var(--danger);font-family:var(--mono);font-size:11px;border-radius:var(--radius-sm);border:1px solid rgba(255,77,77,.3)}
+.locked-note{padding:10px 16px;background:var(--danger-soft);color:var(--danger);font-family:var(--mono);font-size:11px;border-radius:var(--radius-sm);border:1px solid rgba(255,77,77,.3);margin-bottom:12px}
 @media(max-width:1100px){.grid-main{grid-template-columns:1fr}}
 @media(max-width:768px){:root{--sidebar-w:0px}.sidebar{display:none}.content{padding:14px}.topbar{padding:10px 14px}.agency-name{font-size:12px}.search-box{min-width:0;flex:1}.form-grid{grid-template-columns:1fr}#map{height:440px}.tac-panel{width:calc(100% - 70px)}.report-grid{grid-template-columns:1fr}}
 </style>
@@ -397,11 +394,11 @@ var CONFIG={TOKEN_KEY:'simptr-token',USER_KEY:'simptr-user',DEMO_MODE_KEY:'simpt
 var supabaseClient=null,currentUser=null;
 try{if(window.supabase&&SUPABASE_URL.includes('supabase.co')){supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY)}}catch(e){console.warn(e)}
 
-/* ============ DATA PTR — Excel PP14/2026 (Unik) ============ */
+/* ============ DATA PTR — Excel PP14/2026 (Unik saja) ============ */
 /* [td,tr,lat,lng,lintangDMS,bujurDMS,perbatasan,perairan,provinsi,kab,kecamatan,lokasi,koarmada,kodaeral,status] */
 var RAW=[
 ["001","001",1.240833,104.575556,"01°14'27\" U","104°34'32\" T","Malaysia","Laut Natuna","Kepri","Bintan","Bintan Pesisir","Pulau Berakit","Koarmada I","Kodaeral IV (Batam)","normal"],
-["001A","001A",1.047778,104.830556,"01°02'52\" U","104°49'50\" T","Malaysia","Laut Natuna","Kepri","Bintan","Bintan Pesisir","Pulau Sentut","Koarmada I","Kodaeral IV (Batam)","normal"],
+["001A","001A",1.047778,104.830556,"01°02'52\" U","104°49'50\" T","Malaysia","Laut Natuna","Kepri","Bintan","Bintan Pesisir","Pulau Sentut","Koarmada I","Kodaeral IV (Batam)","repair"],
 ["022","022",2.299944,105.596167,"02°17'59.8\" U","105°35'46.2\" T","Malaysia","Laut Natuna","Kepri","Natuna","Siantan","Pulau Tokongmalangbiru","Koarmada I","Kodaeral IV (Batam)","repair"],
 ["023","023",2.741389,105.379444,"02°44'29\" U","105°22'46\" T","Malaysia","Laut Natuna Utara","Kepri","Natuna","Jemaja","Pulau Damar","Koarmada I","Kodaeral IV (Batam)","relocate"],
 ["024","024",3.092222,105.583333,"03°05'32\" U","105°35'00\" T","Malaysia","Laut Natuna","Kepri","Kep. Anambas","Jemaja","P. Mangkai","Koarmada I","Kodaeral IV (Batam)","repair"],
@@ -482,11 +479,6 @@ var RAW=[
 ["112","124",7.975278,126.466389,"07°58'31\" S","126°27'59\" T","Australia, RDTL","Selat Wetar","Maluku","Maluku Barat Daya","Wetar Timur","Tutun Eden, P. Wetar","Koarmada III","Kodaeral IX (Ambon)","normal"],
 ["112A","125",8.062222,125.735,"08°03'44\" S","125°44'06\" T","Australia, RDTL","Selat Wetar","Maluku","Maluku Barat Daya","Wetar Barat","P. Lirang","Koarmada III","Kodaeral VII (Kupang)","normal"],
 ["113","125",8.317778,125.140278,"08°19'04\" S","125°08'25\" T","Australia, RDTL","Selat Ombai","NTT","Alor","Alor Barat Daya","Tg. Lisomu, P. Alor","Koarmada III","Kodaeral VII (Kupang)","normal"],
-["113AA","128B",8.319083,125.140278,"08°19'08.7\" S","125°08'25\" T","Australia, RDTL","Selat Ombai","NTT","Alor","Alor Barat Daya","Tg. Lisomu, P. Alor","Koarmada III","Kodaeral VII (Kupang)","normal"],
-["113AB","128",8.324556,125.137528,"08°19'28.4\" S","125°08'15.1\" T","Australia, RDTL","Selat Ombai","NTT","Alor","Alor Barat Daya","Tg. Lisomu, P. Alor","Koarmada III","Kodaeral VII (Kupang)","normal"],
-["113AC","129",8.338778,125.123583,"08°20'19.6\" S","125°07'24.9\" T","Australia, RDTL","Selat Ombai","NTT","Alor","Alor Barat Daya","Pulau Alor","Koarmada III","Kodaeral VII (Kupang)","normal"],
-["113AD","130",8.339861,125.120667,"08°20'23.5\" S","125°07'14.4\" T","Australia, RDTL","Selat Ombai","NTT","Alor","Alor Barat Daya","Pulau Alor","Koarmada III","Kodaeral VII (Kupang)","normal"],
-["113AE","130",8.343583,125.112611,"08°20'36.9\" S","125°06'45.4\" T","Australia, RDTL","Selat Ombai","NTT","Alor","Alor Barat Daya","Tg. Kilasa, P. Alor","Koarmada III","Kodaeral VII (Kupang)","normal"],
 ["113A","131",8.357222,125.060278,"08°21'26\" S","125°03'37\" T","Australia, RDTL","Selat Ombai","NTT","Alor","Alor Barat Daya","Tg. Seromu, P. Alor","Koarmada III","Kodaeral VII (Kupang)","normal"],
 ["114A","134",9.462278,125.087861,"09°27'44.2\" S","125°05'16.3\" T","Australia, RDTL","Laut Timor","NTT","Malaka","Motamasin","Muara Motamasi, P. Timor","Koarmada III","Kodaeral VII (Kupang)","normal"],
 ["116","138",9.882778,124.75,"09°52'58\" S","124°45'00\" T","Australia, RDTL","Laut Timor","NTT","Timor Tengah Selatan","Boking","Tg. Batu Merah, P. Timor","Koarmada II","Kodaeral VII (Kupang)","normal"],
@@ -582,7 +574,7 @@ var Toast=(function(){var c=document.getElementById('toastContainer');var ic={su
 
 /* ============ API ============ */
 var API=(function(){var isDemo=function(){return localStorage.getItem(CONFIG.DEMO_MODE_KEY)==='true'||!supabaseClient};return{
-login:function(email,password){if(isDemo())return Promise.resolve({token:'demo',user:{id:'demo',username:'demo',fullName:'Operator BNPP',role:'owner',region:'Jakarta'}});return supabaseClient.auth.signInWithPassword({email:email,password:password}).then(function(r){if(r.error)throw new Error(r.error.message);return supabaseClient.from('users').select('*').eq('id',r.data.user.id).single().then(function(p){if(p.error&&!p.data)throw new Error('Akun belum terdaftar di tabel users — jalankan SQL setup.');return{token:r.data.session.access_token,user:{id:r.data.user.id,username:(p.data&&p.data.username)||email.split('@')[0],fullName:(p.data&&p.data.full_name)||email,role:(p.data&&p.data.role)||'user',region:(p.data&&p.data.region)||'Unknown',email:email}}})})},
+login:function(email,password){if(isDemo())return Promise.resolve({token:'demo',user:{id:'demo',username:'demo',fullName:'Operator BNPP',role:'owner',region:'Jakarta'}});return supabaseClient.auth.signInWithPassword({email:email,password:password}).then(function(r){if(r.error)throw new Error(r.error.message);return supabaseClient.from('users').select('*').eq('id',r.data.user.id).single().then(function(p){var u={id:r.data.user.id,username:(p.data&&p.data.username)||r.data.user.email.split('@')[0],fullName:(p.data&&p.data.full_name)||r.data.user.email,role:(p.data&&p.data.role)||(p.data?'user':'owner'),region:(p.data&&p.data.region)||'Unknown',email:r.data.user.email};return{token:r.data.session.access_token,user:u}}).catch(function(){return{token:r.data.session.access_token,user:{id:r.data.user.id,username:r.data.user.email.split('@')[0],fullName:r.data.user.email,role:'owner',region:'Unknown',email:r.data.user.email}}})})},
 getStats:function(){if(isDemo()){var n=PTR_DATA_FULL.filter(function(p){return p.condition_status==='normal'}).length;return Promise.resolve({total:PTR_DATA_FULL.length,normal:n,need_action:PTR_DATA_FULL.length-n,overdue:26,with_cctv:CCTV_CODES.length})}return supabaseClient.from('ptr').select('condition_status,has_cctv').then(function(r){if(r.error)throw new Error(r.error.message);var d=r.data||[];var n=d.filter(function(p){return p.condition_status==='normal'}).length;return{total:d.length,normal:n,need_action:d.length-n,overdue:26,with_cctv:d.filter(function(p){return p.has_cctv}).length}})},
 getPtrList:function(){if(isDemo())return Promise.resolve({data:PTR_DATA_FULL,total:PTR_DATA_FULL.length});return supabaseClient.from('ptr').select('*').order('code').then(function(r){if(r.error)throw new Error(r.error.message);return{data:r.data||[],total:(r.data||[]).length}})},
 getCctvList:function(){if(isDemo())return Promise.resolve({data:PTR_DATA_FULL.filter(function(p){return CCTV_CODES.indexOf(p.code)>=0})});return supabaseClient.from('ptr').select('*').eq('has_cctv',true).order('code').then(function(r){if(r.error)throw new Error(r.error.message);return{data:r.data||[]}})},
@@ -596,7 +588,7 @@ logout:function(){if(!isDemo()&&supabaseClient)return supabaseClient.auth.signOu
 var Auth=(function(){var ls=document.getElementById('loginScreen'),ma=document.getElementById('mainApp'),lf=document.getElementById('loginForm'),le=document.getElementById('loginError'),lb=document.getElementById('loginBtn');
 function showApp(u){currentUser=u;localStorage.setItem(CONFIG.USER_KEY,JSON.stringify(u));ls.classList.add('hidden');ma.style.display='grid';document.getElementById('userName').textContent=u.fullName||u.username;document.getElementById('userRole').textContent=(u.role||'').toUpperCase()+' · '+(u.region||'—');document.getElementById('userAvatar').textContent=(u.fullName||u.username).substring(0,2).toUpperCase();applyPermissions();Dashboard.init()}
 function showLogin(){ls.classList.remove('hidden');ma.style.display='none'}
-var init=function(){if(!supabaseClient){showLogin();return}supabaseClient.auth.getSession().then(function(s){if(s.data&&s.data.session){supabaseClient.from('users').select('*').eq('id',s.data.session.user.id).single().then(function(p){var u={id:s.data.session.user.id,username:(p.data&&p.data.username)||s.data.session.user.email.split('@')[0],fullName:(p.data&&p.data.full_name)||s.data.session.user.email,role:(p.data&&p.data.role)||'user',region:(p.data&&p.data.region)||'Unknown'};showApp(u)})}else showLogin()}).catch(showLogin)};
+var init=function(){if(!supabaseClient){showLogin();return}supabaseClient.auth.getSession().then(function(s){if(s.data&&s.data.session){supabaseClient.from('users').select('*').eq('id',s.data.session.user.id).single().then(function(p){var u={id:s.data.session.user.id,username:(p.data&&p.data.username)||s.data.session.user.email.split('@')[0],fullName:(p.data&&p.data.full_name)||s.data.session.user.email,role:(p.data&&p.data.role)||(p.data?'user':'owner'),region:(p.data&&p.data.region)||'Unknown',email:s.data.session.user.email};showApp(u)}).catch(function(){var u={id:s.data.session.user.id,username:s.data.session.user.email.split('@')[0],fullName:s.data.session.user.email,role:'owner',region:'Unknown',email:s.data.session.user.email};showApp(u)})}else showLogin()}).catch(showLogin)};
 lf.addEventListener('submit',function(e){e.preventDefault();le.classList.remove('show');lb.disabled=true;lb.textContent='MEMPROSES...';API.login(document.getElementById('loginUsername').value,document.getElementById('loginPassword').value).then(function(d){localStorage.setItem(CONFIG.TOKEN_KEY,d.token);localStorage.removeItem(CONFIG.DEMO_MODE_KEY);Toast.show('success','ACCESS GRANTED','Selamat datang '+d.user.fullName);showApp(d.user)}).catch(function(err){le.textContent='⚠ '+err.message;le.classList.add('show')}).finally(function(){lb.disabled=false;lb.textContent='▶ MASUK'})});
 document.getElementById('demoBtn').addEventListener('click',function(){localStorage.setItem(CONFIG.DEMO_MODE_KEY,'true');Toast.show('info','MODE DEMO','Login sebagai Owner (simulasi)');showApp({id:'demo',username:'demo',fullName:'Operator BNPP',role:'owner',region:'Jakarta'})});
 document.getElementById('logoutBtn').addEventListener('click',function(){if(confirm('Keluar sistem?')){API.logout();localStorage.clear();currentUser=null;showLogin()}});
@@ -614,14 +606,10 @@ function loadPtrData(){return API.getPtrList().then(function(r){ptrData=r.data||
 function loadCctvData(){return API.getCctvList().then(function(r){cctvData=r.data||[];document.getElementById('mapCctvCount').textContent=cctvData.length})}
 
 function initMap(){if(map)return;map=L.map('map',{center:[-2.5,118],zoom:5,minZoom:3,maxZoom:18});
-// Base: Esri World Imagery (Satelit)
-L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{
-  attribution:'© Esri',maxZoom:19
-}).addTo(map);
-// Overlay: Esri Reference Labels (nama tempat)
-labelLayer=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',{
-  attribution:'© Esri',maxZoom:19
-}).addTo(map);
+// Esri World Imagery (Satelit - GRATIS, tanpa API key)
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri | © OpenStreetMap',maxZoom:19}).addTo(map);
+// Esri Reference Labels (nama tempat)
+labelLayer=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:19}).addTo(map);
 renderMarkers();renderCamChips();
 document.getElementById('filterKoarmada').addEventListener('change',function(e){var sel=e.target.value;Object.keys(markers).forEach(function(k){var m=markers[k];var ptr=ptrData.find(function(p){return p.code===m.code});if(!sel||(ptr&&ptr.koarmada===sel)){map.addLayer(m.marker);if(m.cam)map.addLayer(m.cam)}else{map.removeLayer(m.marker);if(m.cam)map.removeLayer(m.cam)}})});
 document.getElementById('globalSearch').addEventListener('input',function(e){var q=e.target.value.toLowerCase();if(!q)return;var hit=ptrData.find(function(p){return p.code.toLowerCase().indexOf(q)>=0||(p.region||'').toLowerCase().indexOf(q)>=0||(p.location_desc||'').toLowerCase().indexOf(q)>=0});if(hit&&markers[hit.code]){map.setView([hit.latitude,hit.longitude],8);openTac(hit)}})}
@@ -723,7 +711,7 @@ return{open:open}})();
 
 /* ============ THEME / NAV / OFFLINE ============ */
 (function(){var root=document.documentElement,btn=document.getElementById('themeToggle'),saved=localStorage.getItem('simptr-theme');if(saved)root.setAttribute('data-theme',saved);btn.addEventListener('click',function(){var n=root.getAttribute('data-theme')==='dark'?'light':'dark';root.setAttribute('data-theme',n);localStorage.setItem('simptr-theme',n)})})();
-(function(){var items=document.querySelectorAll('.nav-item');items.forEach(function(it){it.addEventListener('click',function(e){if(it.id==='navReports'||it.id==='navUsers')return;e.preventDefault();items.forEach(function(i){i.classList.remove('active')});it.classList.add('active');var v=it.dataset.view;if(v==='cctv')document.getElementById('cctvPanel').scrollIntoView({behavior:'smooth'});if(v==='inventory')document.getElementById('inventoryPanel').scrollIntoView({behavior:'smooth'});if(v==='map')document.getElementById('map').scrollIntoView({behavior:'smooth'})})})})();
+(function(){var items=document.querySelectorAll('.nav-item');items.forEach(function(it){it.addEventListener('click',function(e){if(it.id==='navReports'||it.id==='navUsers')return;e.preventDefault();items.forEach(function(i){i.classList.remove('active')});it.classList.add('active')})})})();
 (function(){var b=document.getElementById('offlineBanner'),u=function(){if(b)b.classList.toggle('show',!navigator.onLine)};window.addEventListener('online',function(){u();Toast.show('success','LINK RESTORED','Sinkronisasi berjalan');Dashboard.init()});window.addEventListener('offline',u);u()})();
 
 document.addEventListener('DOMContentLoaded',function(){Auth.init()});
